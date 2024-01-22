@@ -1,0 +1,5 @@
+{
+    "require": {
+        "nmiles/phpqrcode": "^1.0"
+    }
+}
