@@ -1,0 +1,53 @@
+{
+    "packages": [
+        {
+            "name": "nmiles/phpqrcode",
+            "version": "v1.0.0",
+            "version_normalized": "1.0.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nmiles/PhpQrCode.git",
+                "reference": "d7597d4205193e93ad1f9aec3887951cc01d905b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nmiles/PhpQrCode/zipball/d7597d4205193e93ad1f9aec3887951cc01d905b",
+                "reference": "d7597d4205193e93ad1f9aec3887951cc01d905b",
+                "shasum": ""
+            },
+            "require": {
+                "ext-gd": "*",
+                "ext-zlib": "*",
+                "php": ">=7.3"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.1.4",
+                "squizlabs/php_codesniffer": "^3.5"
+            },
+            "time": "2020-05-27T16:38:31+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "PhpQrCode\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0-or-later"
+            ],
+            "description": "PHP 7 QR Code library - update of original version by Dominik Dzienia",
+            "keywords": [
+                "qr",
+                "qr codes"
+            ],
+            "support": {
+                "issues": "https://github.com/nmiles/PhpQrCode/issues",
+                "source": "https://github.com/nmiles/PhpQrCode/tree/master"
+            },
+            "install-path": "../nmiles/phpqrcode"
+        }
+    ],
+    "dev": true,
+    "dev-package-names": []
+}
