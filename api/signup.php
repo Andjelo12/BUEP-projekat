@@ -55,7 +55,7 @@ if(!empty($firstName) && !empty($lastName) && !empty($email) && !empty($password
         http_response_code(400);
         echo json_encode("User already exsists");
     }
-    /*$sql="INSERT INTO users()";
+    /*$sql="INSERT INTO users2()";
     $query = $pdo -> prepare($sql);
     $query->bindValue("email",$email);
     $query->execute();

@@ -11,7 +11,9 @@ function init() {
     let mm=String(today.getMonth()+1).padStart(2,'0');
     let yyy=today.getFullYear();
     let hours=today.getHours();
+    if (hours < 10)  hours = '0'+hours;
     let minutes=today.getMinutes();
+    if (minutes < 10)  minutes = '0'+minutes;
     today=yyy+'-'+mm+'-'+dd+"T"+hours+":"+minutes;
     date.min=today;
     addEventFrm.addEventListener('submit', function (e) {

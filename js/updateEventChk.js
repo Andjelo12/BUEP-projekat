@@ -10,8 +10,11 @@ function init() {
     let dd=String(today.getDate()).padStart(2,'0');
     let mm=String(today.getMonth()+1).padStart(2,'0');
     let yyy=today.getFullYear();
+    /*Postavljanja trenutnog datuma i vremena kao najmanje moguće vrednosti za izbor*/
     let hours=today.getHours();
+    if (hours < 10)  hours = '0'+hours;
     let minutes=today.getMinutes();
+    if (minutes < 10)  minutes = '0'+minutes;
     today=yyy+'-'+mm+'-'+dd+"T"+hours+":"+minutes;
     date.min=today;
     updateEventFrm.addEventListener('submit', function (e) {
@@ -54,13 +57,13 @@ function init() {
         } else {
             hideErrorMessage(date);
         }
-        //
-        // if (isEmpty(date.value)){
-        //     showErrorMessage(name, "Molimo unesite datum");
-        //     isValid = false;
-        // } else {
-        //     hideErrorMessage(name);
-        // }
+
+        if (isEmpty(date.value)){
+            showErrorMessage(date, "Molimo unesite datum");
+            isValid = false;
+        } else {
+            hideErrorMessage(date);
+        }
         /*if (img.files.length==0){
             showErrorMessage(img, "Molimo ubacite sliku");
             isValid = false;

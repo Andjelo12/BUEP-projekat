@@ -50,7 +50,7 @@ if(!empty($email) && !empty($password)){
         http_response_code(401);
         echo json_encode('Wrong Details');
     }
-    /*$sql="SELECT password FROM users where email=:email";
+    /*$sql="SELECT password FROM users2 where email=:email";
     $query = $pdo -> prepare($sql);
     $query->bindValue("email",$email);
     $query->execute();
