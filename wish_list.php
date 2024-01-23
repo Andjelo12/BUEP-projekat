@@ -106,11 +106,14 @@ $id=$_GET['id'];
             $('#addLinkFieldError').text('');
         });
     });
+    //Dodavanje poklona u listu želja primenom jQuery-a i AJAX-a
     $(document).on('submit', '#addPresent', function(e) {
         e.preventDefault();
         var present = $('#addPresentField').val();
         var link = $('#addLinkField').val();
+        //Provera podataka pre slanja
         if (present != '' && link != '') {
+            /*Slanje podataka na stranicu add_user_present.php*/
             $.ajax({
                 url: "add_user_present.php",
                 type: "post",
@@ -122,10 +125,10 @@ $id=$_GET['id'];
                 success: function(data) {
                     var json = JSON.parse(data);
                     var status = json.status;
+                    /*provera vraćenih podataka*/
                     if (status === 'true') {
                         mytable = $('#example').DataTable();
                         mytable.draw();
-                        // alert("Poklon uspešno dodat")
                         $('#message').text('Poklon uspešno dodat!');
                         $('#notificationModal').modal('show');
                         $('#addPresentField').val('');
@@ -134,13 +137,12 @@ $id=$_GET['id'];
                         $('#addLinkFieldError').text('');
                         $('#addPresentModal').modal('hide');
                     } else {
-                        //alert('failed');
                         $('#addLinkFieldError').text('Link poklona nije validan.');
                     }
                 }
             });
         } else {
-            //alert('Fill all the required fields');
+            /*Obaveštenja o grešci*/
             if (present == '') {
                 $('#addPresentFieldError').text('Unesite naziv poklona.');
             } else {

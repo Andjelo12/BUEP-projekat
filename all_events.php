@@ -235,7 +235,7 @@ if ($archived==0){
                         <div style="position: absolute; top: 2px; right: 2px;"><button class="btn btn-dark" type="button" onclick="checkMessage(<?php echo $result->id?>)"><i class="bi bi-chat-square-text"></i> <sup><?php echo $result3['cnt']?></sup></button></div>
                     </div>
                     <?php }?>
-                    <img src="images/<?php echo $result->foto?>"  alt="Image" />
+                    <img height="320px" src="images/events/<?php echo $result->foto?>"  alt="Image" />
                     <div class="card-body">
                         <p class="card-text"><?php echo $result->description ?></p>
                         <div class="d-flex justify-content-between align-items-center">
@@ -262,13 +262,16 @@ if ($archived==0){
                         <div class="d-flex justify-content-between align-items-center" style="margin-top: 10px">
                             <div class="btn-group">
                                 <?php
+                                $subclass='';
+                                if ($result->archived=='yes')
+                                    $subclass='disabled';
                                 if ($result->is_blocked=='free'){
                                 ?>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="blockEvent(<?php echo $result->id; ?>,<?php echo $archived;?>)">Blokiraj događaj</button>
+                                    <button type="button" class="btn btn-sm btn-outline-danger <?php echo $subclass;?>" onclick="blockEvent(<?php echo $result->id; ?>,<?php echo $archived;?>)">Blokiraj događaj</button>
                                 <?php
                                 } else {
                                 ?>
-                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="unblockEvent(<?php echo $result->id; ?>, <?php echo $archived;?>)">Odblokiraj događaj</button>
+                                    <button type="button" class="btn btn-sm btn-outline-success <?php echo $subclass;?>" onclick="unblockEvent(<?php echo $result->id; ?>, <?php echo $archived;?>)">Odblokiraj događaj</button>
                                 <?php
                                 }
                                 ?>

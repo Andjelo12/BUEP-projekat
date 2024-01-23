@@ -20,11 +20,11 @@ if (isset($_POST['id'])){
         $stmt2->bindValue(":id",$id,PDO::PARAM_INT);
         $stmt2->execute();
         $result2=$stmt2->fetch();
-        unlink("images/".$result2['foto']);
+        unlink("images/events/".$result2['foto']);
         $sql = "UPDATE event SET name=:name, description=:description, date=:date,location=:location,foto=:foto WHERE id=:id";
         $random=mt_rand(1,10000);
         $file_name = "$random-".$_FILES['img']["name"];
-        $upload = "images/$file_name";
+        $upload = "images/events/$file_name";
         move_uploaded_file($file_temp, $upload);
     } else
         $sql = "UPDATE event SET name=:name, description=:description, date=:date,location=:location WHERE id=:id";
@@ -126,7 +126,7 @@ require_once 'header.php';
             <input type="submit" class="btn btn-primary mb-3" value="sačuvaj promene" name="sb">
         </div>
             </div>
-            </div>
+        </div>
     </div>
     <?php
     require_once 'footer.php';

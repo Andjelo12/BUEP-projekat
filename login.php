@@ -54,9 +54,9 @@ require_once 'config.php';
         <small></small>
     </div>
     <div class="pt-3">
-        <label for="loginPassword" class="form-label">Lozinka</label>
-        <input type="password" class="form-control" id="loginPassword" placeholder="Password"
-               name="password">
+        <label for="loginPassword" class="form-label">Lozinka <i class="bi bi-eye-slash-fill"
+                                                                 id="passwordEye"></i></label>
+        <input type="password" class="form-control passwordVisibiliy" id="loginPassword" placeholder="Password" name="password">
         <small></small>
     </div>
     <div class="pt-3">

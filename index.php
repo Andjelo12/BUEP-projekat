@@ -49,27 +49,36 @@ require_once 'functions_def.php';
             height: 300px;
         }
 
-        swiper-slide img {
+        /*swiper-slide div*/
+        .images{
             display: block;
+            /*object-fit: fill;*/
             width: 100%;
+            height: 100%;
         }
     </style>
 </head>
 <body class="bg-light ">
 <?php
+$error=$_SESSION['error_invite']??null;
+if (isset($error)){
+    echo "<script>
+            $(window).on('load', function() {
+                $('#msg').text('$error');
+                $('#exampleModal').modal('show');
+            });           
+          </script>";
+    unset($_SESSION['error_invite']);
+}
 $error=$_SESSION['error']??null;
 if (isset($error)){
     echo "<script>
             $(window).on('load', function() {
-                $('#msg').text('Zvanica ne postoji!');
+                $('#msg').text('{$_SESSION['error']}');
                 $('#exampleModal').modal('show');
             });           
           </script>";
     unset($_SESSION['error']);
-}
-$error2=$_GET['error2']??null;
-if (isset($error2)){
-    echo "<script>alert('Poklon je već izabran')</script>";
 }
 $invite_message=$_SESSION['invite_message']??null;
 if (isset($invite_message)) {
@@ -99,7 +108,7 @@ require_once 'header.php';
     <?php
     require_once 'functions_def.php';
     //$sql = "SELECT estates.id_estate,estates.description,estates.estate_type,estates.location,estates.price,estates.foto,estates.rent_period,estates.status, estates.approved FROM estates INNER JOIN user_estate ON estates.id_estate=user_estate.id_estate WHERE email=:email";
-    $sql="SELECT * FROM event WHERE archived='no'";
+    $sql="SELECT * FROM event WHERE archived='no' AND is_blocked='free'";
     $query = $pdo -> prepare($sql);
     //$query->bindParam(':email',$_SESSION["username"], PDO::PARAM_STR);
     $query->execute();
@@ -111,19 +120,39 @@ require_once 'header.php';
     {
     ?>
     <swiper-slide>
-        <div>
-        <span><?php echo $result->name?></span><a href="event.php?event_no=<?php echo $result->id?>"><img src="images/<?php echo $result->foto ?>" alt="Image" /></a>
+        <div style="height: 100%;">
+            <small style="text-align: center; display: block; max-height: 7%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?php echo $result->name?></small>
+            <a href="event.php?event_no=<?php echo $result->id?>">
+                <img src="images/events/<?php echo $result->foto ?>" style="width: 100%; height: 93%; object-fit: cover;" alt="<?php echo $result->foto ?>">
+            </a>
         </div>
+        <!--<div style="display: flex; flex-direction: column; height: 100%;">
+            <span style="height: 20%;"><?php /*echo $result->name*/?></span>
+            <a href="event.php?event_no=<?php /*echo $result->id*/?>" style="flex: 1; overflow: hidden;">
+                <img src="images/<?php /*echo $result->foto */?>" style="width: 100%; height: 100%; object-fit: fill;" alt="Image" />
+            </a>
+        </div>-->
     </swiper-slide>
     <?php
     }
-    }
+    } else {
     ?>
+    <swiper-slide>
+        <img src="images/no_events.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="no events">
+    </swiper-slide>
+    <swiper-slide>
+        <img src="images/no_events.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="no events">
+    </swiper-slide>
+    <swiper-slide>
+        <img src="images/no_events.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="no events">
+    </swiper-slide>
+    <?php }?>
 </swiper-container>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-element-bundle.min.js"></script>
 <?php
 require_once 'footer.php';
 ?>
+<!--Modal obaveštenja na index-noj stranici-->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">

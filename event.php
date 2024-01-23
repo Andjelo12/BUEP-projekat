@@ -73,18 +73,23 @@ if (isset($error))
                 $('#errorModal').modal('show');
             });           
           </script>";
-$event_no=$_GET['event_no'];
+$event_no=$_GET['event_no']??null;
+if (!isset($event_no))
+    header("Location:index.php");
 $sql_query="SELECT * FROM event WHERE id = :event_no";
 $query= $pdo -> prepare($sql_query);
 $query->bindParam(':event_no',$_GET['event_no']);
 $query->execute();
 $result=$query->fetch(PDO::FETCH_OBJ);
+if ($query->rowCount()==0)
+    header("Location: index.php");
 if($query->rowCount() > 0) {
+    $archived=$result->archived;
     ?>
     <div class="container">
         <div class="row">
             <div class="col-md-5">
-                <img src="images/<?php echo $result->foto?>" class="img-fluid" width="400" height="400" alt="Image"/>
+                <img src="images/events/<?php echo $result->foto?>" class="img-fluid" width="100%" style="max-height: 500px" alt="Image"/>
             </div>
             <div class="gx-5 col-md-5">
                 <div style="font-size: 12pt">
@@ -125,7 +130,7 @@ if($query->rowCount() > 0) {
                             }
                         }
                     }
-                    if (!$found){
+                    if (!$found && $archived=='no'){
                 ?>
                 <a href="#" id="fl">Želeli bi ste da dođete na događaj?</a>
                 <form action="requestForInvite.php" method="get" name="invite" id="inviteForm">
@@ -140,7 +145,7 @@ if($query->rowCount() > 0) {
                         <button type="submit" class="btn btn-primary" style="margin-top: 5px">Pošaljite</button>
                     </div>
                 </form>
-                <?php }}} else { ?>
+                <?php }}} elseif (false/*isset($_SESSION['username']) && isset($_SESSION['is_admin']) && $_SESSION['is_admin']=='No' && $archived=='no'*/) {?>
                     <a href="#" id="fl">Želeli bi ste da dođete na događaj?</a>
                     <form action="requestForInvite.php" method="get" name="invite" id="inviteForm">
                         <div class="pt-3">
@@ -158,7 +163,16 @@ if($query->rowCount() > 0) {
                             <button type="submit" class="btn btn-primary" style="margin-top: 5px">Pošaljite</button>
                         </div>
                     </form>
-                <?php } ?>
+                <?php } else {
+                    if ($archived=='no') {
+                        require_once 'phpqrcode/qrlib.php';
+                        echo "Zainteresovani za događaj? Skenirajte kod!<br>";
+                        QRcode::png(SITE . "QRinvite.php?event_no=" . $_GET['event_no'], 'images/temp/temp.png', QR_ECLEVEL_L, 5, 2);
+//                    QRcode::png('https://www.google.com/', 'images/temp/temp.png', QR_ECLEVEL_L, 5, 2);
+                        echo '<img style="margin-top: 15px" src="images/temp/temp.png" alt="qr_code">';
+                    }
+                }
+                ?>
                 </div>
             </div>
         </div>

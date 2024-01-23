@@ -9,11 +9,12 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']=='Yes'){
     redirection('login.php?l=0');
 }
 $archived=$_GET['archived'];
+$id=$_GET['id'];
 $sql="SELECT * FROM messages
   INNER JOIN event ON messages.id_event=event.id
        WHERE id_event=:id_event";
 $stmt=$pdo->prepare($sql);
-$stmt->bindValue(":id_event",$_GET['id'],PDO::PARAM_INT);
+$stmt->bindValue(":id_event",$id,PDO::PARAM_INT);
 $stmt->execute();
 $results=$stmt->fetchAll();
 ?>
@@ -75,7 +76,9 @@ $results=$stmt->fetchAll();
     $(document).ready(function() {
         $('#addUserModal').on('hidden.bs.modal', function () {
             $('#messageField').val('');
-            $('#addWishList').prop('checked', false);
+            if ($('#addWishList')) {
+                $('#addWishList').prop('checked', false);
+            }
         });
         $('#confirm-delete').on('click', function() {
             var idMessage = $('.delete-invite-btn.active').data('id-message');
@@ -96,10 +99,12 @@ $results=$stmt->fetchAll();
         var mesg = $('#messageField').val();
         var email = $('#email').val();
         var fname = $('#fname').val();
-        var checked = $('#addWishList').is(":checked");
         var addWishList='no';
-        if (checked==true){
-            addWishList='yes'
+        if ($('#addWishList')){
+            var checked = $('#addWishList').is(":checked");
+            if (checked==true){
+                addWishList='yes'
+            }
         }
         const isEmpty = value => value === '';
         let validateData = () => {
@@ -169,9 +174,10 @@ require_once 'header.php';
             <div id="append" class="d-flex justify-content-between">
                 <strong class="text-gray-dark font-monospace">Od(ime | email): <?php echo $result['invite_name']?> | <?php echo $result['sender_email']?> (<?php echo $result['date_time']?>)</strong>
                 <div>
-                <?php if ($result['status']=='unreplied'){?>
+                <?php
+                $subclass='';
+                if ($result['status']=='unreplied'){?>
                     <?php
-                    $subclass='';
                     if ($archived!=0) {
                         $subclass='disabled';
                     }?>
@@ -225,10 +231,19 @@ require_once 'footer.php';
                             <small></small>
                         </div>
                     </div>
+                    <?php
+                    $sql="SELECT COUNT(*) AS CNT FROM wish_list WHERE event_id=:event_id";
+                    $stmt=$pdo->prepare($sql);
+                    $stmt->bindValue(":event_id",$id,PDO::PARAM_INT);
+                    $stmt->execute();
+                    $result=$stmt->fetch();
+                    if ($result['CNT'] > 0){
+                    ?>
                     <div class="mb-3 row">
                         <label for="addWishList" class="col-md-3 form-label" style="font-size: 14px">Dodaj listu želja</label>
                         <input type="checkbox" style="margin-left: 3px" class="col-md-1 form-check" id="addWishList" name="wishList" value="yes">
                     </div>
+                    <?php } ?>
                     <div class="text-center" style="margin-bottom: 10px">
                         <button type="submit" class="btn btn-primary">Dodaj</button>
                     </div>

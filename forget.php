@@ -17,7 +17,7 @@ switch ($method) {
     case "get":
         if (!empty($token) and strlen($token) === 40) {
 
-            $sql = "SELECT id_user FROM users 
+            $sql = "SELECT id_user FROM users2 
             WHERE binary forgotten_password_token = :token AND forgotten_password_expires>now() AND active= 1";
 
             $stmt = $pdo->prepare($sql);
@@ -72,7 +72,7 @@ switch ($method) {
 
             $passwordHashed = password_hash($resetPassword, PASSWORD_DEFAULT);
 
-            $sql = "UPDATE users SET forgotten_password_token = '', forgotten_password_expires = '', password = :resetPassword
+            $sql = "UPDATE users2 SET forgotten_password_token = '', forgotten_password_expires = '', password = :resetPassword
             WHERE binary forgotten_password_token = :token AND forgotten_password_expires>now() AND active = 1 AND email = :email";
 
             $stmt = $pdo->prepare($sql);

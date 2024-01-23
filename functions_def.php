@@ -52,7 +52,7 @@ function redirection($url)
  */
 function checkUserLogin(PDO $pdo, string $email, string $enteredPassword): array
 {
-    $sql = "SELECT id_user, firstname,password, is_admin, is_banned, active FROM users WHERE email=:email LIMIT 0,1";
+    $sql = "SELECT id_user, firstname,password, is_admin, is_banned, active FROM users2 WHERE email=:email LIMIT 0,1";
     $stmt= $pdo->prepare($sql);
     $stmt->bindParam(':email', $email, PDO::PARAM_STR);
 
@@ -118,7 +118,7 @@ function insertIntoDetects(string $userAgent, string $ipAddress, string $deviceT
 }
 
 function emailExists(PDO $pdo, string $email){
-    $sql = "SELECT id_user FROM users WHERE email=:email LIMIT 0,1";
+    $sql = "SELECT id_user FROM users2 WHERE email=:email LIMIT 0,1";
     $stmt= $pdo->prepare($sql);
     $stmt->bindParam(':email', $email, PDO::PARAM_STR);
     $stmt->execute();
@@ -157,7 +157,7 @@ function getCurlData($url): string
 }
 
 function getEmail(PDO $pdo, string $token){
-    $sql = "SELECT email FROM users WHERE binary forgotten_password_token = :token AND forgotten_password_expires>now()";
+    $sql = "SELECT email FROM users2 WHERE binary forgotten_password_token = :token AND forgotten_password_expires>now()";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':token', $token, PDO::PARAM_STR);
     $stmt->execute();
@@ -175,7 +175,7 @@ function getEmail(PDO $pdo, string $token){
 function existsUser(PDO $pdo, string $email): bool
 {
 
-    $sql = "SELECT id_user FROM users WHERE email=:email AND (registration_expires>now() OR active ='1') LIMIT 0,1";
+    $sql = "SELECT id_user FROM users2 WHERE email=:email AND (registration_expires>now() OR active ='1') LIMIT 0,1";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':email', $email, PDO::PARAM_STR);
     $stmt->execute();
@@ -203,7 +203,7 @@ function registerUser(PDO $pdo, string $password, string $firstname, string $las
 
     $passwordHashed = password_hash($password, PASSWORD_DEFAULT);
 
-    $sql = "INSERT INTO users(password,firstname,lastname,email,registration_token, registration_expires,active)
+    $sql = "INSERT INTO users2(password,firstname,lastname,email,registration_token, registration_expires,active)
             VALUES (:passwordHashed,:firstname,:lastname,:email,:token,DATE_ADD(now(),INTERVAL 1 DAY),0)";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':passwordHashed', $passwordHashed, PDO::PARAM_STR);
@@ -348,7 +348,7 @@ function addEmailFailure(PDO $pdo, int $id_user, string $message): void
  */
 function getUserData(PDO $pdo, string $data, string $field, string $value): string
 {
-    $sql = "SELECT $data as data FROM users WHERE $field=:value LIMIT 0,1";
+    $sql = "SELECT $data as data FROM users2 WHERE $field=:value LIMIT 0,1";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':value', $value, PDO::PARAM_STR);
     $stmt->execute();
@@ -372,7 +372,7 @@ function getUserData(PDO $pdo, string $data, string $field, string $value): stri
  */
 function setForgottenToken(PDO $pdo, string $email, string $token): void
 {
-    $sql = "UPDATE users SET forgotten_password_token = :token, forgotten_password_expires = DATE_ADD(now(),INTERVAL 6 HOUR) WHERE email = :email";
+    $sql = "UPDATE users2 SET forgotten_password_token = :token, forgotten_password_expires = DATE_ADD(now(),INTERVAL 6 HOUR) WHERE email = :email";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':token', $token, PDO::PARAM_STR);
     $stmt->bindParam(':email', $email, PDO::PARAM_STR);

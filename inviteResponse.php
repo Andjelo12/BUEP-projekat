@@ -29,6 +29,15 @@ switch ($result['are_coming']){
         $selected3='selected';
         break;
 }
+$sql2="SELECT archived FROM event WHERE id=:event_id AND archived='yes'";
+$stmt2=$GLOBALS['pdo']->prepare($sql2);
+$stmt2->bindParam(":event_id",$result['event_id'],PDO::PARAM_STR);
+$stmt2->execute();
+if ($stmt2->rowCount()>0){
+    $_SESSION['error']="Događaj više nije aktuelan!";
+    header("Location: index.php");
+    exit();
+}
 $selected4='';
 /*$sql="SELECT user_buying_present
         FROM wish_list
@@ -74,7 +83,7 @@ foreach ($results as $result)
         body {
             background: #eee;
             font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-            font-size: 14px;
+            /*font-size: 14px;*/
             color: #000;
             margin: 0;
             padding: 0;

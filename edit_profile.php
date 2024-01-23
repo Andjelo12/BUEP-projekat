@@ -39,6 +39,10 @@ if (!isset($_SESSION['username'])) {
             margin: 0;
             padding: 0;
         }
+        .error-message{
+            color: #f00;
+            /*display: block;*/
+        }
     </style>
 </head>
 <script>
@@ -49,28 +53,77 @@ if (!isset($_SESSION['username'])) {
         // });
     }
 </script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        // Handle form submission
+        $('#changeProfileData').submit(function (event) {
+            event.preventDefault();
+            var id_user=$('#id_user').val();
+            var fname = $('#firstname').val();
+            var lname = $('#lastname').val();
+            // Reset previous error messages
+            //$('.error-message').text('');
+
+            // Get form data
+            //var formData = $(this).serialize();
+
+            // Make the AJAX request
+            if (fname!='' && lname!='') {
+                $.ajax({
+                    type: 'GET',
+                    url: 'change_profile_data.php',
+                    data: {
+                        id_user:id_user,
+                        firstname:fname,
+                        lastname:lname
+                    },
+                    success: function (response) {
+                        location.reload();
+                    }
+                });
+            } else {
+                if (fname==''){
+                    $('#firstname-error').text('Unesite ime!');
+                }else {
+                    $('#firstname-error').text('');
+                }
+                if (lname==''){
+                    $('#lastname-error').text('Unesite prezime!');
+                }else {
+                    $('#lastname-error').text('');
+                }
+            }
+        });
+
+        // Handle click on the confirmDelete button inside the modal
+        $('#confirmDelete').click(function () {
+            // Perform the deletion action here (call deleteProfile.php)
+            var id_user = $('#id_user').val();
+
+            $.ajax({
+                type: 'POST',
+                url: 'deleteUserProfile.php',
+                data: {
+                    email: '<?php echo $_SESSION['username']?>'
+                },
+                success: function (response) {
+                    // Handle success response if needed
+                    //location.reload(); // Reload the page or handle as required
+                    window.location.href='index.php';
+                }
+            });
+
+            // Close the modal after confirming
+            //$('#confirmDeleteModal').modal('hide');
+        });
+    });
+</script>
 <body class="bg-light ">
 <?php
-if (isset($_POST['id_user'])){
-    $fName=ucfirst(strtolower(trim($_POST["firstname"])));
-    $lName=ucfirst(strtolower(trim($_POST["lastname"])));
-    $sql = "UPDATE users SET firstname=:firstname, lastname=:lastname WHERE id_user=:id_user";
-    $query = $pdo -> prepare($sql);
-    $query->bindParam(':id_user',$_POST["id_user"], PDO::PARAM_INT);
-    $query->bindParam(':firstname',$fName, PDO::PARAM_STR);
-    $query->bindParam(':lastname',$lName, PDO::PARAM_STR);
-    $query->execute();
-    if($query->rowCount() > 0) {
-        $_SESSION['firstname']=$fName;
-        $_SESSION['change_data'] = 'Data successfully changed';
-    }
-    header("Location: edit_profile.php");
-    exit();
-}
 require_once 'header.php';
 ?>
 <br>
-<form method="post" action="" id="addEvent" name="addEvent">
+<form method="post" action="" id="changeProfileData">
     <?php
     if (isset($_SESSION['change_data'])){
         echo "<script>
@@ -89,7 +142,7 @@ require_once 'header.php';
           </script>";
         unset($_SESSION['change_pass']);
     }
-    $sql = "SELECT * FROM users WHERE id_user=:id";
+    $sql = "SELECT * FROM users2 WHERE id_user=:id";
     $query = $pdo -> prepare($sql);
     $query->bindParam(':id', $_SESSION['id_user'], PDO::PARAM_INT);
     $query->execute();
@@ -102,25 +155,27 @@ require_once 'header.php';
     }
     ?>
     <div class="container">
-        <input type="text" name="id_user" value="<?php echo $_SESSION['id_user']; ?>" style="display: none">
+        <input type="text" name="id_user" id="id_user" value="<?php echo $_SESSION['id_user']; ?>" style="display: none">
         <div class="justify-content-center row" >
         <div style="width: 22rem">
         <div class="mb-3">
             <label for="firstname" class="form-label">Ime</label>
             <input type="text" class="form-control" name="firstname" id="firstname" value="<?php echo $firstname ?>">
-            <small></small>
+            <small class="error-message" id="firstname-error"></small>
         </div>
         <div class="mb-3">
             <label for="lastname" class="form-label">Prezime</label>
             <input type="text" class="form-control" name="lastname" id="lastname" value="<?php echo $lastname?>">
-            <small></small>
+            <small class="error-message" id="lastname-error"></small>
         </div>
         <div class="mb-3">
+            <div class="d-flex justify-content-between">
             <?php if (empty($requestSend)){?>
-                <a href="change_pass.php">Resetuj lozinku</a>
+                <a href="change_pass.php" style="display: initial">Resetuj lozinku</a><a href="#!" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" id="deletProfile" class="link-danger">Obriši profil</a>
             <?php } else {?>
-                <a href="#" onclick="showBlockedModal()" style="color: #f00">Resetuj lozinku</a>
+                <a href="#" onclick="showBlockedModal()" style="color: #f00">Resetuj lozinku</a><a href="#!" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" id="deletProfile" class="link-danger">Obriši profil</a>
             <?php }?>
+            </div>
         </div>
         <div class="col-auto">
             <input type="submit" class="btn btn-primary mb-3" value="Sačuvaj">
@@ -165,6 +220,23 @@ require_once 'header.php';
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Zatvori</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Potvrda brisanja profila</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Da li ste sigurni da želite da obrišete svoj profil?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="confirmDelete">Potvrdi</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Odustani</button>
             </div>
         </div>
     </div>

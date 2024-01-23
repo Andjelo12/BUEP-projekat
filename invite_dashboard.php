@@ -37,6 +37,7 @@ if ($stmt->rowCount()>0) {
     </style>
 <body class="bg-light ">
 <?php
+if (isset($_SESSION['username'])){
 if($email==$_SESSION['username']){
     require_once 'header.php';
 } else {
@@ -46,7 +47,13 @@ if($email==$_SESSION['username']){
         <a class="navbar-brand" href="index.php">Home</a>
     </div>
 </nav>
-<?php } ?>
+<?php }} else { ?>
+<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="index.php">Home</a>
+    </div>
+</nav>
+<?php }?>
 <br>
 <div class="container-fluid">
     <div class="row">

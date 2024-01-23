@@ -4,6 +4,7 @@ $output= array();
 $email=$_POST['email'];
 $sql = "SELECT
     e.name AS event_name,
+    e.archived AS archived,
     e.date AS date,
     COALESCE(wl.item, '') AS item,
     COALESCE(wl.link, '') AS link,
@@ -79,7 +80,10 @@ while($row = mysqli_fetch_assoc($query))
     }
 	$sub_array[] =$prevod;
     $sub_array[] = '<a href="'.$row['link'].'">'.$row['item'].'</a>';
-	$sub_array[] = '<a href="inviteResponse.php?code='.$row['invite_code'].'" data-id="'.$row['invite_code'].'"  class="btn btn-info btn-sm editbtn" >Izmeni</a>';//javascript:void();
+    $subclass='';
+    if ($row['archived']=='yes')
+        $subclass='disabled';
+	$sub_array[] = '<a href="inviteResponse.php?code='.$row['invite_code'].'" data-id="'.$row['invite_code'].'"  class="btn btn-info btn-sm editbtn '.$subclass.'" >Izmeni</a>';//javascript:void();
 	$data[] = $sub_array;
 }
 

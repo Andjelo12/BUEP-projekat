@@ -5,6 +5,8 @@ require_once 'functions_def.php';
 if (!isset($_SESSION['username']) OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])) {
     redirection('login.php?l=0');
 }
+if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']=='Yes')
+    redirection('login.php?l=0');
 ?>
 
 <!DOCTYPE html>
@@ -65,16 +67,24 @@ require_once 'header.php';
         <small></small>
     </div>
     <?php
-    $sql='SELECT COUNT(invites.event_id) as num 
-            FROM event 
-      INNER JOIN invites
-             ON event.id=invites.event_id
-            WHERE created_by=:created_by';
+    $sql="SELECT id FROM event WHERE created_by = :created_by ORDER BY id DESC LIMIT 1;";
     $stmt=$pdo->prepare($sql);
     $stmt->bindValue(":created_by",$_SESSION['username']);
     $stmt->execute();
     $result=$stmt->fetch();
-    if($result['num']>0){
+    if ($stmt->rowCount()>0) {
+        $id = $result['id'];
+        /*$sql='SELECT COUNT(invites.event_id) as num
+            FROM event
+      INNER JOIN invites
+             ON event.id=invites.event_id
+            WHERE created_by=:created_by';*/
+        $sql2="SELECT COUNT(event_id) as num FROM invites WHERE event_id=:event_id";
+        $stmt2=$pdo->prepare($sql2);
+        $stmt2->bindValue(":event_id",$id);
+        $stmt2->execute();
+        $result2=$stmt2->fetch();
+        if($result2['num']>0) {
     ?>
     <div class="mb-3">
         <input type="hidden" name="">
@@ -82,8 +92,9 @@ require_once 'header.php';
         <label for="oldInvites" class="form-check-label">Dodaj zvanice sa prethodnog događaja</label>
     </div>
     <?php
+        }
     }
-    ?>
+        ?>
     <div class="col-auto">
         <input type="submit" class="btn btn-primary mb-3" value="kreiraj događaj">
     </div>

@@ -19,7 +19,7 @@ $check2=$stmt2->rowCount() > 0;
 //$result=$stmt->fetchAll();
 
 /*$conn = new mysqli("localhost", "tim", "Xj3W3WLgQeQxOp6", "tim");
-$stmt = $conn->prepare("SELECT email FROM users WHERE email = ?");
+$stmt = $conn->prepare("SELECT email FROM users2 WHERE email = ?");
 $stmt->bind_param("s", $obj->email);
 $stmt->execute();
 $stmt->store_result();*/

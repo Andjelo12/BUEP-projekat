@@ -9,7 +9,7 @@ $id=$_GET["id"];
 $foto_name=$_GET['foto_name'];
 $message=$_GET['message']??null;
 include_once 'functions_def.php';
-$imageFullPath='images/'.$foto_name;
+$imageFullPath='images/events/'.$foto_name;
 unlink($imageFullPath);
 $sql = "SELECT created_by, name FROM event WHERE id=:id";
 $query = $pdo -> prepare($sql);

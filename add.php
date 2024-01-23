@@ -18,10 +18,10 @@ if (!isset($name) || !isset($description) || !isset($date) || !isset($location) 
 $file_temp = $_FILES["img"]["tmp_name"];
 $random=mt_rand(1,10000);
 $file_name = "$random-".$_FILES['img']["name"];
-$upload = "images/$file_name";
+$upload = "images/events/$file_name";
 move_uploaded_file($file_temp, $upload);
 if ($addOldInvites=='checked') {
-    $sql = "WITH CTE AS ( SELECT id, ROW_NUMBER() OVER(PARTITION BY created_by=:created_by ORDER BY id DESC) AS RN FROM event ) SELECT * FROM CTE WHERE RN=1 ORDER BY id; ";
+    $sql = "SELECT id FROM event WHERE created_by = :created_by ORDER BY id DESC LIMIT 1;";
     $stmt = $pdo->prepare($sql);
     $stmt->bindValue(":created_by", $_SESSION['username']);
     $stmt->execute();
@@ -58,7 +58,7 @@ if($query->rowCount() > 0)
             $stmt->execute();
             $phpmailer = new PHPMailer(true);
             $phpmailer->isSMTP();
-            $phpmailer->SMTPDebug=1;
+            //$phpmailer->SMTPDebug=1;
             $phpmailer->Host = 'first.stud.vts.su.ac.rs';
             $phpmailer->SMTPAuth = true;
             $phpmailer->Username   = 'first';
