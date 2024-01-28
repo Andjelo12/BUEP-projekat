@@ -94,6 +94,221 @@ function getIpAddress()
     return $ip;
 }
 
+function getAllEvents(): array|bool
+{
+    $sql = "SELECT * FROM event WHERE is_blocked='free' AND archived='no'";
+    $stmt = $GLOBALS['pdo']->prepare($sql);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getEvent(int $id){
+    $sql = "SELECT * FROM event WHERE id=:id";
+    $stmt = $GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":id",$id,PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function updateEventImage($foto, $description, $location, $date, $eventName, $eventId){
+    $sql="UPDATE event SET name=:name, description=:description, location=:location, date=:date, foto=:foto WHERE id=:id";
+    $stmt=$GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(':foto',$foto,PDO::PARAM_STR);
+    $stmt->bindValue(':description',$description,PDO::PARAM_STR);
+    $stmt->bindValue(':location',$location,PDO::PARAM_STR);
+    $stmt->bindValue(':date',$date,PDO::PARAM_STR);
+    $stmt->bindValue(':name',$eventName,PDO::PARAM_STR);
+    $stmt->bindValue(':id',$eventId,PDO::PARAM_STR);
+    $stmt->execute();
+}
+function updateEventNoImage(string $description, string $location, string $date, string $eventName, int $eventId){
+    $sql="UPDATE event SET name=:name, description=:description, location=:location, date=:date, foto=foto WHERE id=:id";
+    $stmt=$GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(':description',$description,PDO::PARAM_STR);
+    $stmt->bindValue(':location',$location,PDO::PARAM_STR);
+    $stmt->bindValue(':date',$date,PDO::PARAM_STR);
+    $stmt->bindValue(':name',$eventName,PDO::PARAM_STR);
+    $stmt->bindValue(':id',$eventId,PDO::PARAM_STR);
+    $stmt->execute();
+    return $stmt->rowCount() > 0;
+}
+
+function addPresent(int $event_id, string $link, string $presentName){
+    if (!filter_var($link, FILTER_VALIDATE_URL)) {
+        response(400, "Invalid URL sent!");
+        exit();
+    }
+    $sql="INSERT INTO wish_list(item,link,event_id) VALUE (:item,:link,:event_id)";
+    $stmt=$GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":item",$presentName,PDO::PARAM_STR);
+    $stmt->bindValue(":link",$link,PDO::PARAM_STR);
+    $stmt->bindValue(":event_id",$event_id,PDO::PARAM_INT);
+    $stmt->execute();
+    response(200, "Present successfully added!");
+}
+
+function deletePresent(int $id){
+    $sql="DELETE FROM wish_list WHERE id=:id";
+    $stmt=$GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":id",$id,PDO::PARAM_STR);
+    $stmt->execute();
+
+    if ($stmt->rowCount()>0) {
+        response(200, "Present successfully deleted!");
+    }else{
+        response(404, "Present with given ID doesn't exists!");
+    }
+}
+
+function getData($id, $table){
+    $sql="SELECT * FROM $table WHERE event_id=:event_id";
+    $stmt=$GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":event_id",$id,PDO::PARAM_INT);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getUserEvents($email){
+    $sql = "SELECT * FROM event WHERE created_by=:created_by";
+    $stmt = $GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":created_by",$email,PDO::PARAM_STR);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function deleteEvent($id){
+    $sql = "DELETE FROM event WHERE id=:id";
+    $stmt = $GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->rowCount() > 0;
+}
+
+function deleteInvite($id){
+    $sql = "DELETE FROM invites WHERE id=:id";
+    $stmt = $GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->rowCount() > 0;
+}
+
+function archiveEvent(int $id){
+    $sql="UPDATE event SET archived='yes' WHERE id=:id";
+    $stmt=$GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":id",$id,PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->rowCount() > 0;
+}
+function insertIntoEvents(string $foto, string $description, string $location, string $date, string $name,string $created_by){
+    $sql = "INSERT INTO event(name, description, date,location,foto,created_by) VALUES (:name, :description, :date, :location,:foto,:created_by)";
+    $query = $GLOBALS['pdo'] -> prepare($sql);
+    $query->bindParam(':foto',$foto,PDO::PARAM_STR);
+    $query->bindParam(':name',$name, PDO::PARAM_STR);
+    $query->bindParam(':description',$description, PDO::PARAM_STR);
+    $query->bindParam(':date',$date, PDO::PARAM_STR);
+    $query->bindParam(':location',$location, PDO::PARAM_STR);
+    $query->bindParam(':created_by',$created_by, PDO::PARAM_STR);
+    $query->execute();
+}
+
+function sendInvite(int $event_id, string $inviteEmail, string $inviteName){
+    if (!filter_var($inviteEmail, FILTER_VALIDATE_EMAIL)) {
+        response(400, "Mail is in in invalid format!");
+        exit();
+    }
+    checkIfInvited($event_id,$inviteEmail);
+    $token=createToken(10);
+    $event=findEvent($event_id);
+    $time=date("H:i",strtotime($event['time2']));
+    insertIntoInvites($inviteEmail, $inviteName, $event_id,$token);
+    $phpmailer = new PHPMailer(true);
+
+    $phpmailer->isSMTP();
+    $phpmailer->Host = 'first.stud.vts.su.ac.rs';
+    $phpmailer->SMTPAuth = true;
+    $phpmailer->Port = 587;
+    $phpmailer->Username = 'first';
+    $phpmailer->Password = 'ZADcO14NsZMPzeU';
+
+
+    $phpmailer->setFrom("first@first.stud.vts.su.ac.rs");
+    $phpmailer->addAddress("$inviteEmail");
+
+    $phpmailer->isHTML(true);
+    $phpmailer->CharSet = 'UTF-8';
+    $phpmailer->Subject = "Pozivnica za događaj";
+    $phpmailer->Body = "Pozdrav. Pozvani ste da dođete na \"{$event['name']}\" događaj koji će se održati {$event['date2']} u {$time}h. Da bi ste potvrdili vaš dolazak potrebno je da odete na <a href=" . SITE . "inviteResponse.php?code=$token>link</a>";
+    $phpmailer->AltBody = "Pozdrav. Pozvani ste da dođete na \"{$event['name']}\" događaj koji će se održati {$event['date2']} u {$event['time2']}h. Da bi ste potvrdili vaš dolazak potrebno je da odete na ".SITE."inviteResponse.php?code=$token";
+
+    $phpmailer->send();
+    response(200, "Invite to user successfully sent!");
+}
+
+function insertIntoInvites(string $inviteEmail, string $inviteName, int $event_id, string $invite_code){
+    $sql = "INSERT INTO invites (email, name, event_id, invite_code, wish_list) values (:email,:name,:event_id,:invite_code, 'yes')";
+    $stmt=$GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":email",$inviteEmail,PDO::PARAM_STR);
+    $stmt->bindValue(":name",$inviteName,PDO::PARAM_STR);
+    $stmt->bindValue(":event_id",$event_id,PDO::PARAM_INT);
+    $stmt->bindValue(":invite_code",$invite_code,PDO::PARAM_STR);
+    $stmt->execute();
+}
+
+function checkIfMessageSend(int $id, string $email){
+    $sql="SELECT sender_email FROM messages WHERE id_event=:id_event";
+    $stmt=$GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":id_event", $id, PDO::PARAM_INT);
+    $stmt->execute();
+    $results=$stmt->fetchAll();
+    foreach ($results as $result){
+        if ($result['sender_email']==$email){
+            response(406, "Email already sent!");
+            exit();
+        }
+    }
+}
+
+function checkIfInvited(int $id, string $email):void{
+    $sql = "SELECT * FROM invites WHERE event_id=:id";
+    $stmt=$GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+    $stmt->execute();
+    $results=$stmt->fetchAll();
+    foreach ($results as $result){
+        if ($result['email']==$email){
+            response(409, "User already in invites");
+            exit();
+        }
+    }
+}
+
+function findEvent(int $id):array{
+    $sql = "SELECT created_by, name, DATE(date) as date2, TIME(date) as time2 FROM event WHERE id=:id";
+    $stmt = $GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":id",$id,PDO::PARAM_STR);
+    $stmt->execute();
+
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+function response(int $status, string $status_message, mixed $data = null): void
+{
+    header("HTTP/1.1 " . $status);
+
+    $response['status'] = $status;
+    $response['status_message'] = $status_message;
+
+    if ($data !== null) {
+        $response['data'] = $data;
+    }
+
+    echo json_encode($response);
+}
+
 /**Function inserts data into log table.
  * @param string $userAgent
  * @param string $ipAddress
