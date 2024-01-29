@@ -21,7 +21,11 @@ $table = $_GET['table'] ?? "";
 $id = $_GET['id'] ?? '';
 
 if (!in_array($table, $tables)) {
-    response(404, "Wrong table");
+    http_response_code(404);
+    header("Allow: login, register, forget");
+    echo json_encode([
+        "message" => "Wrong table"
+    ]);
     exit();
 }
 
@@ -54,6 +58,10 @@ if ($method==="get" && $table==="wish_list"){
 
 if ($method==="put" && $table==='wish_list'){
     if (isset($link,$presentName) && !empty($id)) {
+        if (getEvent($id)===false) {
+            response(404,"Can't add present, event with given ID doesn't exist");
+            exit();
+        }
         addPresent($id, $link, $presentName);
     }else{
         response(422, "Please provide id, link and present name");
@@ -94,6 +102,10 @@ if ($method==="delete" && $table==="invites"){
 
 if ($method==="put" && $table==="invites"){
     if (isset($inviteName, $inviteEmail) && !empty($id)){
+        if (getEvent($id)===false) {
+            response(404,"Can't add invite, event with given ID doesn't exist");
+            exit();
+        }
         sendInvite($id, $inviteEmail, $inviteName);
     } else {
         response(422, "Data missing");
