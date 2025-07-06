@@ -1,0 +1,389 @@
+{
+	"info": {
+		"_postman_id": "5bbb24fd-8d3b-4587-8b0e-1041698587b8",
+		"name": "buep ispit",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "31235466",
+		"_collection_link": "https://orange-spaceship-210430.postman.co/workspace/buep-ispit~65a0bac8-4128-4c27-957f-97513b42ea3c/collection/31235466-5bbb24fd-8d3b-4587-8b0e-1041698587b8?action=share&source=collection_link&creator=31235466"
+	},
+	"item": [
+		{
+			"name": "Valid authorization",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "09be6df77bfa0f22b261"
+					}
+				},
+				"method": "GET",
+				"header": [],
+				"url": "{{host}}/api/events"
+			},
+			"response": [
+				{
+					"name": "Valid authorization",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": "{{host}}/api/events/"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 03 Jul 2025 14:49:02 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Apache"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5, max=100"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"status_message\": \"Data found\",\n    \"data\": [\n        {\n            \"id\": 11,\n            \"name\": \"Perin rođendan\",\n            \"description\": \"Perica slavi 21 rođendan. Dođite na proslavu\",\n            \"date\": \"2027-01-28 20:00:00\",\n            \"foto\": \"9867-stock-vector-birthday-balloons-vector-background-design-happy-birthday-to-you-text-with-balloon-and-confetti-2003677130.jpg\",\n            \"location\": \"Srbija, Subotica\",\n            \"created_by\": \"26121057@vts.su.ac.rs\",\n            \"is_blocked\": \"free\",\n            \"archived\": \"no\"\n        },\n        {\n            \"id\": 12,\n            \"name\": \"Godišnjica braka\",\n            \"description\": \"Pozivam Vas na 5 godišnjicu moga braka.\",\n            \"date\": \"2028-01-19 20:00:00\",\n            \"foto\": \"7009-ezgif-8a6c5e98af970b.jpg\",\n            \"location\": \"Srbija, Beograd\",\n            \"created_by\": \"26121057@vts.su.ac.rs\",\n            \"is_blocked\": \"free\",\n            \"archived\": \"no\"\n        },\n        {\n            \"id\": 15,\n            \"name\": \"Imendan\",\n            \"description\": \"Poziva Vas na moj imendan.\",\n            \"date\": \"2030-01-24 23:30:00\",\n            \"foto\": \"7011-SmartSize.jpg\",\n            \"location\": \"Pačir, Srbija\",\n            \"created_by\": \"26121057@vts.su.ac.rs\",\n            \"is_blocked\": \"free\",\n            \"archived\": \"no\"\n        },\n        {\n            \"id\": 23,\n            \"name\": \"Događaj sa pozivanjem prethodnih zvanica\",\n            \"description\": \"Pozivanje prethodnih zvanica\",\n            \"date\": \"2028-01-13 14:00:00\",\n            \"foto\": \"3640-d3f5d3a540e5b359459e5dcfe43a9a25.jpg\",\n            \"location\": \"Pešta\",\n            \"created_by\": \"26121057@vts.su.ac.rs\",\n            \"is_blocked\": \"free\",\n            \"archived\": \"no\"\n        }\n    ]\n}"
+				},
+				{
+					"name": "Token missing",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": "{{host}}/api/events/"
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 03 Jul 2025 14:49:19 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Apache"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5, max=100"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Authorization token missing\"\n}"
+				},
+				{
+					"name": "Invalid token",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": "{{host}}/api/events/"
+					},
+					"status": "Unauthorized",
+					"code": 401,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Thu, 03 Jul 2025 14:50:12 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Apache"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5, max=100"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"message\": \"Invalid authorization token\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Delete event",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "04bcddf34274219310b9"
+					}
+				},
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"url": "{{host}}/api/events/23"
+			},
+			"response": [
+				{
+					"name": "Delete event",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [],
+							"options": {
+								"raw": {
+									"language": "html"
+								}
+							}
+						},
+						"url": "{{host}}/api/events/11"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 05 Jul 2025 20:29:19 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Apache"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5, max=100"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"status_message\": \"Data deleted successfully.\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Archive event",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": {
+						"token": "09be6df77bfa0f22b261"
+					}
+				},
+				"method": "PATCH",
+				"header": [],
+				"url": "{{host}}/api/events/23"
+			},
+			"response": [
+				{
+					"name": "Archive event",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"url": "{{host}}/api/events/23"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 05 Jul 2025 20:52:29 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Apache"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5, max=100"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"status_message\": \"Event archived\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Create token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\":\"26121057@vts.su.ac.rs\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "{{host}}/api/tokens/"
+			},
+			"response": [
+				{
+					"name": "Token created",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"26121057@vts.su.ac.rs\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{host}}/api/tokens/"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sun, 06 Jul 2025 16:03:00 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Apache"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5, max=100"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 200,\n    \"status_message\": \"Token created\"\n}"
+				},
+				{
+					"name": "Invalid email",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"26121057@vts.su.ac.rs\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{host}}/api/tokens/"
+					},
+					"status": "Forbidden",
+					"code": 403,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sun, 06 Jul 2025 15:46:17 GMT"
+						},
+						{
+							"key": "Server",
+							"value": "Apache"
+						},
+						{
+							"key": "Keep-Alive",
+							"value": "timeout=5, max=100"
+						},
+						{
+							"key": "Connection",
+							"value": "Keep-Alive"
+						},
+						{
+							"key": "Transfer-Encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": 403,\n    \"status_message\": \"Invalid email\"\n}"
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "http://rsharp.stud.vts.su.ac.rs",
+			"type": "default"
+		}
+	]
+}
