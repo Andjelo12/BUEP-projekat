@@ -1,14 +1,13 @@
 <?php
-
 const PARAMS = [
     "HOST" => 'localhost',
-    "USER" => 'root',
-    "PASS" => '',
-    "DBNAME" => 'nwp_projekat',
+    "USER" => 'rsharp',
+    "PASS" => 'HE9TiVYvUs1G9Xl',
+    "DBNAME" => 'rsharp',
     "CHARSET" => 'utf8mb4'
 ];
 
-const SITE = 'http://localhost/nwp_projekat_01/'; // enter your path on localhost
+const SITE = 'https://rsharp.stud.vts.su.ac.rs/'; // enter your path on localhost
 
 $dsn = "mysql:host=" . PARAMS['HOST'] . ";dbname=" . PARAMS['DBNAME'] . ";charset=" . PARAMS['CHARSET'];
 
@@ -23,10 +22,10 @@ $actions = ['login', 'register', 'forget'];
 $messages = [
     0 => 'Loš URL!',
     1 => 'Netačni podaci!',
-    2 => 'Korisnik sa navedenim e-mailom već postoji, izaberite drugi!',
+    2 => 'Korisnik sa navedenim e-mailom već postoji!',
     3 => 'Proverite e-mail da bi ste aktivirali nalog!',
     4 => 'Popunite sva polja!',
-    5 => 'Izlogovani ste!!',
+    5 => 'Izlogovani ste!',
     6 => 'Vaš nalog je aktiviran, možete se ulogovati!',
     7 => 'Lozinke se ne poklapaju!',
     8 => 'E-mail adresa je u lošem formatu!',
@@ -39,7 +38,8 @@ $messages = [
     15 => 'Token or other data are invalid!',
     16 => 'Vaša nova lozinka je postavljena i možete se ulogovati <a href="login.php" class="text-white">ovde</a>',
     17 => 'Vaš nalog je trenutno blokiran. Obratite se administratoru',
-    18 => 'Nalog još uvek nije aktiviran! Proverite vaš email'
+    18 => 'Nalog još uvek nije aktiviran! Proverite vaš email',
+    19 => 'Google login nije bio moguć!'
 ];
 
 $emailMessages = [

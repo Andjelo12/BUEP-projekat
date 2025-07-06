@@ -18,14 +18,14 @@ $stmt->bindValue(":id_user", $id_user,PDO::PARAM_STR);
 $stmt->execute();
 $phpmailer = new PHPMailer(true);
 $phpmailer->isSMTP();
-$phpmailer->Host = 'first.stud.vts.su.ac.rs';
+$phpmailer->Host = 'rsharp.stud.vts.su.ac.rs';
 $phpmailer->SMTPAuth = true;
 $phpmailer->Port = 587;
-$phpmailer->Username = 'first';
-$phpmailer->Password = 'ZADcO14NsZMPzeU';
+$phpmailer->Username = 'rsharp';
+$phpmailer->Password = 'HE9TiVYvUs1G9Xl';
 
 
-$phpmailer->setFrom("first@first.stud.vts.su.ac.rs",'Admin');
+$phpmailer->setFrom("rsharp@rsharp.stud.vts.su.ac.rs",'Admin');
 $phpmailer->addAddress("$email");
 
 $phpmailer->isHTML(true);

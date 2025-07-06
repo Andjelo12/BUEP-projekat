@@ -1,5 +1,7 @@
 {
     "require": {
-        "nmiles/phpqrcode": "^1.0"
+        "stripe/stripe-php": "^17.4",
+        "vlucas/phpdotenv": "^5.6",
+        "google/apiclient": "^2.18"
     }
 }
