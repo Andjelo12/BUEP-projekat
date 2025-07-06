@@ -19,7 +19,6 @@ require_once 'functions_def.php';
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script src="js/scriptDtb.js"></script>
     <style>
         html,
         body {
@@ -92,7 +91,7 @@ if (isset($invite_message)) {
 }
 require_once 'header.php';
 ?>
-<img src="images/free-stock-photos-12.jpeg" style="width: 100%;
+<img src="images/photo-1492684223066-81342ee5ff30.jpg" style="width: 100%;
             height: 90vh;
             object-fit: cover;">
 <!--<h1 style="position: absolute; top:40px; color: #54a399" class="display-1">Kreiranje događaja</h1>-->

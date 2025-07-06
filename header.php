@@ -8,12 +8,27 @@
     function logout(){
         window.location.href="logout.php";
     }
+    function APItoken(){
+        window.location.href="token.php";
+    }
 </script>
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.php">Home</a>
         <?php
-        if (isset($_SESSION['username']) && $_SESSION['is_admin']=='No'){
+        require 'vendor/autoload.php';
+        use \Firebase\JWT\JWT;
+        use \Firebase\JWT\Key;
+        $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+        $dotenv->load();
+        if (isset($_SESSION['jwt_token']) /*&& $_SESSION['is_admin']=='No'*/) {
+            try {
+                $decoded = JWT::decode($_SESSION['jwt_token'], new Key($_ENV['jwt_secret_key'], 'HS256'));
+            }catch (\Firebase\JWT\ExpiredException){
+                redirection('login.php');
+            }
+        }
+        if (isset($decoded) && $decoded->data->is_admin=='No') {
         ?>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
             <span class="navbar-toggler-icon"></span>
@@ -35,7 +50,7 @@
                         <?php
                         $sql="SELECT invite_code FROM invites WHERE email=:email";
                         $stmt5=$pdo->prepare($sql);
-                        $stmt5->bindValue(":email",$_SESSION['username'],PDO::PARAM_STR);
+                        $stmt5->bindValue(":email",$decoded->data->username,PDO::PARAM_STR);
                         $stmt5->execute();
                         $result5=$stmt5->fetch();
                         if ($stmt5->rowCount()>0)
@@ -52,11 +67,14 @@
                     <a class="nav-link" href="edit_profile.php">Izmeni profil</a>
                 </li>
             </ul>
+            <form class="d-flex me-2">
+                <button class="btn btn-warning" type="button" onclick="APItoken()">API token</button>
+            </form>
             <form class="d-flex">
                 <button class="btn btn-primary" type="button" onclick="logout()">Logout</button>
             </form>
         </div>
-            <?php } elseif (isset($_SESSION['is_admin']) && $_SESSION['is_admin']=='Yes') {?>
+            <?php } elseif (isset($decoded) && $decoded->data->is_admin=='Yes') {?>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -75,6 +93,8 @@
                             <a class="dropdown-item" href="user_profiles.php">Korisnički nalozi</a>
                             <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="logs.php">Logovi</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="api_tokens.php">API tokeni</a>
                         </div>
                     </li>
                     <li class="nav-item">

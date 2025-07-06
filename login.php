@@ -1,5 +1,16 @@
 <?php
 require_once 'config.php';
+require __DIR__ . "/vendor/autoload.php";
+$client = new Google\Client();
+
+$client->setClientId("912256885401-cv60jhcr69ug9228fasg5gt8ipgcfo5i.apps.googleusercontent.com");
+$client->setClientSecret("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");
+$client->setRedirectUri("https://rsharp.stud.vts.su.ac.rs/redirectLogin.php");
+
+$client->addScope("email");
+$client->addScope("profile");
+
+$url = $client->createAuthUrl();
 ?>
 <!doctype html>
 <html lang="en">
@@ -64,7 +75,12 @@ require_once 'config.php';
         <button type="submit" class="btn btn-primary w-100">Login</button>
     </div>
 </form>
-
+<div class="pt-3 text-center">
+    <a href="<?php echo $url ?>" class="btn btn-outline-danger w-100">
+        <img src="https://developers.google.com/identity/images/g-logo.png" style="width:20px; margin-right:8px;">
+        Uloguj se sa Google nalogom
+    </a>
+</div>
 
 <?php
 

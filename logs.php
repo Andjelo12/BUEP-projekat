@@ -2,10 +2,22 @@
 session_start();
 require_once 'config.php';
 require_once 'functions_def.php';
-if (!isset($_SESSION['username'])) {
+require 'vendor/autoload.php';
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+if (isset($_SESSION['jwt_token']) /*&& $_SESSION['is_admin']=='No'*/) {
+    try {
+        $decoded = JWT::decode($_SESSION['jwt_token'], new Key($_ENV['jwt_secret_key'], 'HS256'));
+    }catch (\Firebase\JWT\ExpiredException){
+        redirection('login.php');
+    }
+}
+if (!isset($decoded)) {
     redirection('login.php?l=0');
 }
-if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']=='No'){
+if (isset($decoded->data->is_admin) && $decoded->data->is_admin=='No'){
     redirection('login.php?l=0');
 }
 ?>
@@ -202,6 +214,10 @@ require_once 'header.php';
                         $('#typeField').val('računar');
                         break;
                 }
+                if (json.google_login==0)
+                    $('#googleLoginField').val('ne');
+                else
+                    $('#googleLoginField').val('da');
                 if (json.proxy==0)
                     $('#proxyField').val('ne');
                 else
@@ -280,6 +296,12 @@ require_once 'header.php';
                         <label for="proxyField" class="col-md-3 form-label">Proksi</label>
                         <div class="col-md-9">
                             <input type="text" class="form-control" id="proxyField" name="proxy" disabled>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="googleLoginField" class="col-md-3 form-label">Google login</label>
+                        <div class="col-md-9">
+                            <input type="text" class="form-control" id="googleLoginField" name="googleLogin" disabled>
                         </div>
                     </div>
                     <div class="mb-3 row">

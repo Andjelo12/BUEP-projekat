@@ -1,8 +1,21 @@
 <?php
 session_start();
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://developers.google.com; font-src 'self'; connect-src 'self'; frame-src 'none'; object-src 'none'; base-uri 'self';");
 require_once 'config.php';
 require_once 'functions_def.php';
-if (!isset($_SESSION['username']) OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])) {
+require_once 'vendor/autoload.php';
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+if (isset($_SESSION['jwt_token']) /*&& $_SESSION['is_admin']=='No'*/) {
+    try {
+        $decoded = JWT::decode($_SESSION['jwt_token'], new Key($_ENV['jwt_secret_key'], 'HS256'));
+    }catch (\Firebase\JWT\ExpiredException){
+        redirection('login.php');
+    }
+}
+if (!isset($decoded) /*OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])*/) {
     redirection('login.php?l=0');
 }
 ?>
@@ -137,6 +150,8 @@ $id=$_GET['id'];
                         $('#notificationModal').modal('show');
                     } else if (status === 'invalid email'){
                         $('#addEmailFieldError').text('E-mail adresa je u lošem formatu!');
+                    } else if (status === 'same email'){
+                        $('#addEmailFieldError').text('E-mail adresa je adres korisnika koji je kreirao događaj!');
                     } else {
                         $('#addFnameFieldError').text('');
                         $('#addEmailFieldError').text('Korisnik je već dodat u listu zvanica!');
