@@ -10,9 +10,87 @@ $method = strtolower($_SERVER["REQUEST_METHOD"]);
 if (!in_array($method, $methods)) {
     http_response_code(405);
     header("Allow: GET, POST, PATCH, DELETE");
+
     echo json_encode([
         "message" => "$method is not allowed!"
     ]);
+    exit();
+}
+
+$headers = getallheaders();
+$authHeader = $headers['Authorization'] ?? '';
+if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+    http_response_code(401);
+    echo json_encode(["message" => "Authorization token missing"]);
+    exit();
+}
+
+$token = 'Bearer '.$matches[1];
+
+$sql = "SELECT * FROM tokens WHERE token=:token";
+$stmt = $GLOBALS['pdo']->prepare($sql);
+$stmt->bindValue(":token",$token,PDO::PARAM_STR);
+$stmt->execute();
+
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+if($stmt->rowCount() > 0){
+    $sql = "SELECT calls_no, account_type, last_call, last_reset, tokens_no FROM tokens WHERE token=:token";
+    $stmt = $GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":token", $token, PDO::PARAM_INT);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $lastCall = new DateTime($result['last_call']);
+    $oneMonthAgo = new DateTime('-1 month');
+    $lastReset = new DateTime($result['last_reset']);
+    if($lastCall < $oneMonthAgo && $lastReset < $oneMonthAgo){
+        $sql="UPDATE tokens SET calls_no=0, last_reset = NOW() WHERE token=:token";
+        $stmt=$GLOBALS['pdo']->prepare($sql);
+        $stmt->bindValue(':token', $token, PDO::PARAM_STR);
+        $stmt->execute();
+    }
+    switch ($result['account_type']) {
+        case 'bronze':
+            if($result['calls_no'] > $result['tokens_no']){
+                http_response_code(403);
+                echo json_encode(["message" => "Daily bronze account limit exceeded"]);
+                exit();
+            }
+            break;
+        case 'silver':
+            if($result['calls_no'] > $result['tokens_no']){
+                http_response_code(403);
+                echo json_encode(["message" => "Daily silver account limit exceeded"]);
+                exit();
+            }
+            break;
+        case 'gold':
+            if($result['calls_no'] > $result['tokens_no']){
+                http_response_code(403);
+                echo json_encode(["message" => "Daily gold account limit exceeded"]);
+                exit();
+            }
+            break;
+        case 'platinum':
+            if($result['calls_no'] > $result['tokens_no']){
+                http_response_code(403);
+                echo json_encode(["message" => "Daily platinum account limit exceeded"]);
+                exit();
+            }
+            break;
+    }
+    $sql="UPDATE tokens SET calls_no=calls_no+1 WHERE token=:token";
+    $stmt=$GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(':token', $token, PDO::PARAM_STR);
+    $stmt->execute();
+} else {
+    http_response_code(401);
+    echo json_encode(["message" => "Invalid authorization token"]);
+    exit();
+}
+
+if (!$user) {
+    http_response_code(401);
+    echo json_encode(["message" => "Invalid token or daily limit exceeded"]);
     exit();
 }
 
@@ -39,7 +117,7 @@ $id=$_GET['id']??'';
 if ($method === 'get') {
     if(empty($id)) {
         $allData = getAllEvents();
-
+        
         $allData ? response(200, "Data found", $allData) :
             response(404, "Data Not Found");
 
