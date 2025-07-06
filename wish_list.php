@@ -1,8 +1,21 @@
 <?php
 session_start();
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://code.jquery.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; object-src 'none'; frame-src 'self'; base-uri 'self';");
 require_once 'config.php';
 require_once 'functions_def.php';
-if (!isset($_SESSION['username']) OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])) {
+require 'vendor/autoload.php';
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+if (isset($_SESSION['jwt_token']) /*&& $_SESSION['is_admin']=='No'*/) {
+    try {
+        $decoded = JWT::decode($_SESSION['jwt_token'], new Key($_ENV['jwt_secret_key'], 'HS256'));
+    }catch (\Firebase\JWT\ExpiredException){
+        redirection('login.php');
+    }
+}
+if (!isset($decoded) /*OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])*/) {
     redirection('login.php?l=0');
 }
 

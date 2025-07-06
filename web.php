@@ -1,9 +1,12 @@
 <?php
 session_start();
+require 'vendor/autoload.php';
 require_once "config.php";
 require_once "functions_def.php";
 require_once 'Mobile-Detect-3.74.0/src/MobileDetect.php';
-
+use \Firebase\JWT\JWT;
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 $password = "";
 $passwordConfirm = "";
 $firstname = "";
@@ -47,24 +50,40 @@ if ($action != "" and in_array($action, $actions)/* and strpos($referer, SITE) !
                 $userData = emailExists($pdo, $username);
                 if ($data and is_int($data['id_user']) and $data['active']==1) {
                     if ($data['is_banned']==0){
+                        $payload=[
+                            'iss' => 'https://rsharp.stud.vts.su.ac.rs',
+                            'aud' => 'https://rsharp.stud.vts.su.ac.rs',
+                            'iat' => time(),
+                            'nbf' => time(),
+                            'exp' => time()+(60*60),
+                            'data' => [
+                                'username'=>$username,
+                                'firstname'=>$data['firstname'],
+                                'is_admin'=>$data['is_admin'],
+                                'id_user'=>$data['id_user']
+                            ]
+                        ];
+                        $encoded = JWT::encode($payload, $_ENV['jwt_secret_key'], 'HS256');
                         $_SESSION = [];
+                        $_SESSION['jwt_token'] = $encoded;
+                        /*
                         $_SESSION['username'] = $username;
                         $_SESSION['firstname'] = $data['firstname'];
                         $_SESSION['is_admin']=$data['is_admin'];
-                        $_SESSION['id_user'] = $data['id_user'];
+                        $_SESSION['id_user'] = $data['id_user'];*/
                         $lastInsertID=insertIntoUserDetects($username, $userData);
-                        insertIntoDetects($user_agent, $ipAddress,$deviceType, $country, $lastInsertID, $proxy, 'success');
+                        insertIntoDetects($user_agent, $ipAddress,$deviceType, $country, $lastInsertID, $proxy, 'success','0');
                         redirection('index.php');
                     }elseif($data['is_banned']==1){
                         $lastInsertID=insertIntoUserDetects($username, $userData);
-                        insertIntoDetects($user_agent, $ipAddress,$deviceType, $country, $lastInsertID, $proxy, 'banned');
+                        insertIntoDetects($user_agent, $ipAddress,$deviceType, $country, $lastInsertID, $proxy, 'banned','0');
                         redirection('login.php?l=17');
                     }
                 }elseif($data and $data['active']==0){
                     redirection('login.php?l=18');
                 } else {
                     $lastInsertID=insertIntoUserDetects($username, $userData);
-                    insertIntoDetects($user_agent, $ipAddress,$deviceType, $country, $lastInsertID,$proxy, 'wrong data');
+                    insertIntoDetects($user_agent, $ipAddress,$deviceType, $country, $lastInsertID,$proxy, 'wrong data','0');
                     redirection('login.php?l=1');
                 }
 
@@ -130,7 +149,7 @@ if ($action != "" and in_array($action, $actions)/* and strpos($referer, SITE) !
                     $id_user = registerUser($pdo, $password, $firstname, $lastname, $email, $token);
                     try {
                         $lastInsertID=insertIntoUserDetects($email, $id_user);
-                        insertIntoDetects($user_agent, $ipAddress,$deviceType, $country, $lastInsertID, $proxy, 'register');
+                        insertIntoDetects($user_agent, $ipAddress,$deviceType, $country, $lastInsertID, $proxy, 'register','0');
                         $body = "Da bi ste aktivirali nalog potrebno je da odete na <a href=" . SITE . "active.php?token=$token>link</a>";
                         sendEmail($pdo, $email, $emailMessages['register'], $body, $id_user);
                         redirection("login.php?l=3");
@@ -143,7 +162,7 @@ if ($action != "" and in_array($action, $actions)/* and strpos($referer, SITE) !
                 }
             } else {
                 $lastInsertID=insertIntoUserDetects($email, $userData);
-                insertIntoDetects($user_agent, $ipAddress,$deviceType, $country, $lastInsertID, $proxy, 'register with same email');
+                insertIntoDetects($user_agent, $ipAddress,$deviceType, $country, $lastInsertID, $proxy, 'register with same email','0');
                 redirection('register.php?r=2');
             }
 

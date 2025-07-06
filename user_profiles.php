@@ -2,10 +2,22 @@
 session_start();
 require_once 'config.php';
 require_once 'functions_def.php';
-if (!isset($_SESSION['username']) OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])) {
+require 'vendor/autoload.php';
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+if (isset($_SESSION['jwt_token']) /*&& $_SESSION['is_admin']=='No'*/) {
+    try {
+        $decoded = JWT::decode($_SESSION['jwt_token'], new Key($_ENV['jwt_secret_key'], 'HS256'));
+    }catch (\Firebase\JWT\ExpiredException){
+        redirection('login.php');
+    }
+}
+if (!isset($decoded) /*OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])*/) {
     redirection('login.php?l=0');
 }
-if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']=='No'){
+if (isset($decoded->data->is_admin) && $decoded->data->is_admin=='No'){
     redirection('login.php?l=0');
 }
 /*if (isset($_GET['ban'])){
