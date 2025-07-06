@@ -1,5 +1,16 @@
 <?php
 session_start();
+header("Content-Security-Policy: 
+    default-src 'self'; 
+    script-src 'self' https://code.jquery.com https://cdn.jsdelivr.net https://cdn.datatables.net; 
+    style-src 'self' https://cdn.jsdelivr.net https://cdn.datatables.net 'unsafe-inline'; 
+    font-src https://cdn.jsdelivr.net; 
+    img-src 'self' data:; 
+    connect-src 'self'; 
+    object-src 'none'; 
+    frame-ancestors 'none'; 
+    base-uri 'self';
+");
 require_once 'config.php';
 require_once 'functions_def.php';
 $event_no=$_GET['event_no']??null;

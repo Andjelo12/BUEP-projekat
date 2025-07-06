@@ -49,14 +49,14 @@ foreach ($results as $result){
 $phpmailer = new PHPMailer(true);
 
 $phpmailer->isSMTP();
-$phpmailer->Host = 'first.stud.vts.su.ac.rs';
+$phpmailer->Host = 'rsharp.stud.vts.su.ac.rs';
 $phpmailer->SMTPAuth = true;
 $phpmailer->Port = 587;
-$phpmailer->Username = 'first';
-$phpmailer->Password = 'ZADcO14NsZMPzeU';
+$phpmailer->Username = 'rsharp';
+$phpmailer->Password = 'HE9TiVYvUs1G9Xl';
 
 
-$phpmailer->setFrom("first@first.stud.vts.su.ac.rs");
+$phpmailer->setFrom("rsharp@rsharp.stud.vts.su.ac.rs");
 $phpmailer->addAddress("$organiser");
 $phpmailer->addReplyTo($email);
 
