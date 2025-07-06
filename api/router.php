@@ -1,8 +1,10 @@
 <?php
 header("Content-Type:application/json");
-
+/*require_once '../config.php';
+require_once '../functions_def.php';
+*/
 $methods = ['get', 'post', 'put', 'patch', 'delete'];
-$resources=['account','events','presentsInvites'];
+$resources=['account','events','presentsInvites','tokens'];
 
 $method = strtolower($_SERVER["REQUEST_METHOD"]);
 
@@ -25,7 +27,31 @@ if (!in_array($resource,$resources)){
     ]);
     exit();
 }
+/*
+$headers = getallheaders();
+$authHeader = $headers['Authorization'] ?? '';
 
+if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+    http_response_code(401);
+    echo json_encode(["message" => "Authorization token missing or invalid"]);
+    exit();
+}
+
+$token = $matches[1];
+
+    $sql = "SELECT * FROM tokens WHERE token=:token";
+    $stmt = $GLOBALS['pdo']->prepare($sql);
+    $stmt->bindValue(":token",$token,PDO::PARAM_STR);
+    $stmt->execute();
+
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$user) {
+        http_response_code(401);
+        echo json_encode(["message" => "Invalid token or daily limit exceeded"]);
+        exit();
+    }
+*/
 /*if ($resource==='account')
     require_once './account';
 if ($resource==='events')
