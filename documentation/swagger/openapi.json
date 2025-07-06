@@ -1,13 +1,13 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "IWS projekat",
-    "description": "Projekat je realizacije mobilne aplikacije [sajta](https://first.stud.vts.su.ac.rs/nwp/) za kreiranje događaja.\nPutem aplikacije korisnik može da:\n- pogleda aktuelne događaje\n- napravi nalog\n- kreira nove događaje\n- dodaje poklone i pozivnice.\n\n Aplikacija komunicira sa bazom putem api poziva koji su testirani u ovom dokumentu.",
+    "title": "BUEP projekat",
+    "description": "Projekat je realizacije mobilne aplikacije [sajta](https://rsharp.stud.vts.su.ac.rs/) za kreiranje događaja.\nPutem aplikacije korisnik može da:\n- pogleda aktuelne događaje\n- napravi nalog\n- kreira nove događaje\n- dodaje poklone i pozivnice.\n\n Aplikacija komunicira sa bazom putem api poziva koji su testirani u ovom dokumentu.",
     "version": "1.0.11"
   },
   "servers": [
     {
-      "url": "https://first.stud.vts.su.ac.rs/nwp/api"
+      "url": "https://rsharp.stud.vts.su.ac.rs/api"
     }
   ],
   "tags": [
