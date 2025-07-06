@@ -31,6 +31,59 @@ function connectDatabase(string $dsn, array $pdoOptions): PDO
 }
 
 /**
+ * Function checks if token exists in database
+ *
+ * @param string $email
+ */
+function checkTokenExists(string $email): bool
+{
+    $sql = "SELECT * FROM tokens WHERE email=:email LIMIT 0,1";
+    $stmt= $GLOBALS['pdo']->prepare($sql);
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Function checks if token exists in database
+ *
+ * @param string $email
+ */
+function checkValidEmail(string $email): bool
+{
+    $sql = "SELECT * FROM users2 WHERE email=:email LIMIT 0,1";
+    $stmt= $GLOBALS['pdo']->prepare($sql);
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+
+    $stmt->execute();
+
+    if ($stmt->rowCount() > 0) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Function creates token based on email
+ *
+ * @param string $email
+ */
+function createBearerToken($email)
+{
+    $token = 'Bearer ' . createToken(10);
+    $sql = "INSERT INTO tokens(token, email) VALUES (:token, :email)";
+    $query = $GLOBALS['pdo'] -> prepare($sql);
+    $query->bindParam(':token',$token,PDO::PARAM_STR);
+    $query->bindParam(':email',$email, PDO::PARAM_STR);
+    $query->execute();
+}
+
+/**
  * Function redirects user to given url
  *
  * @param string $url
@@ -71,6 +124,36 @@ function checkUserLogin(PDO $pdo, string $email, string $enteredPassword): array
             $data['active']=$result['active'];
             $data['firstname']=$result['firstname'];
         }
+    }
+
+    return $data;
+}
+
+/**
+ * Function checks that login parameters exists in users_web table using google_id
+ *
+ * @param PDO $pdo
+ * @param string $email
+ * @param string $enteredPassword
+ * @return array
+ */
+function checkGoogleUserLogin(PDO $pdo, string $email, string $googleID): array
+{
+    $sql = "SELECT id_user, firstname, is_admin, is_banned, active FROM users2 WHERE google_id=:google_id or email=:email LIMIT 0,1";
+    $stmt= $pdo->prepare($sql);
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt->bindParam(':google_id', $googleID, PDO::PARAM_STR);
+
+    $data = [];
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($stmt->rowCount() > 0) {
+        $data['id_user'] = $result['id_user'];
+        $data['is_banned']=$result['is_banned'];
+        $data['is_admin']=$result['is_admin'];
+        $data['active']=$result['active'];
+        $data['firstname']=$result['firstname'];
     }
 
     return $data;
@@ -180,15 +263,16 @@ function getUserEvents($email){
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-function deleteEvent($id){
-    $sql = "DELETE FROM event WHERE id=:id";
+function deleteEvent(int $id, string $email){
+    $sql = "DELETE FROM event WHERE id=:id and created_by=:created_by";
     $stmt = $GLOBALS['pdo']->prepare($sql);
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
+    $stmt->bindValue(':created_by', $email, PDO::PARAM_STR);
     $stmt->execute();
     return $stmt->rowCount() > 0;
 }
 
-function deleteInvite($id){
+function deleteInvite(int $id){
     $sql = "DELETE FROM invites WHERE id=:id";
     $stmt = $GLOBALS['pdo']->prepare($sql);
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
@@ -196,10 +280,11 @@ function deleteInvite($id){
     return $stmt->rowCount() > 0;
 }
 
-function archiveEvent(int $id){
-    $sql="UPDATE event SET archived='yes' WHERE id=:id";
+function archiveEvent(int $id, string $email){
+    $sql="UPDATE event SET archived='yes' WHERE id=:id and created_by=:created_by";
     $stmt=$GLOBALS['pdo']->prepare($sql);
     $stmt->bindValue(":id",$id,PDO::PARAM_INT);
+    $stmt->bindValue(":created_by",$email,PDO::PARAM_STR);
     $stmt->execute();
     return $stmt->rowCount() > 0;
 }
@@ -228,14 +313,14 @@ function sendInvite(int $event_id, string $inviteEmail, string $inviteName){
     $phpmailer = new PHPMailer(true);
 
     $phpmailer->isSMTP();
-    $phpmailer->Host = 'first.stud.vts.su.ac.rs';
+    $phpmailer->Host = 'rsharp.stud.vts.su.ac.rs';
     $phpmailer->SMTPAuth = true;
     $phpmailer->Port = 587;
-    $phpmailer->Username = 'first';
-    $phpmailer->Password = 'ZADcO14NsZMPzeU';
+    $phpmailer->Username = 'rsharp';
+    $phpmailer->Password = 'HE9TiVYvUs1G9Xl';
 
 
-    $phpmailer->setFrom("first@first.stud.vts.su.ac.rs");
+    $phpmailer->setFrom("rsharp@rsharp.stud.vts.su.ac.rs");
     $phpmailer->addAddress("$inviteEmail");
 
     $phpmailer->isHTML(true);
@@ -315,11 +400,16 @@ function response(int $status, string $status_message, mixed $data = null): void
  * @param string $deviceType
  * @param string $country
  * @param bool $proxy
+ * @param ?string $google_login
  * @return void
  */
-function insertIntoDetects(string $userAgent, string $ipAddress, string $deviceType, string $country, string $lastInsertID,bool $proxy, string $status): void
+function insertIntoDetects(string $userAgent, string $ipAddress, string $deviceType, string $country, string $lastInsertID,bool $proxy, string $status, string $google_login): void
 {
-    $sql = "INSERT INTO detects(user_agent, ip_address, country, proxy, device_type, user_id, status) VALUES(:userAgent, :ipAddress, :country, :proxy, :deviceType, :user_id,:status)";
+    if($google_login!='0') {
+        $sql = "INSERT INTO detects(user_agent, ip_address, country, proxy, device_type, user_id, status, google_login) VALUES(:userAgent, :ipAddress, :country, :proxy, :deviceType, :user_id,:status,:google_login)";
+    }else{
+        $sql = "INSERT INTO detects(user_agent, ip_address, country, proxy, device_type, user_id, status) VALUES(:userAgent, :ipAddress, :country, :proxy, :deviceType, :user_id,:status)";
+    }
     $stmt = $GLOBALS['pdo']->prepare($sql);
     $stmt->bindValue(':userAgent', $userAgent, PDO::PARAM_STR);
     $stmt->bindValue(':ipAddress', $ipAddress, PDO::PARAM_STR);
@@ -328,7 +418,9 @@ function insertIntoDetects(string $userAgent, string $ipAddress, string $deviceT
     $stmt->bindValue(':deviceType', $deviceType, PDO::PARAM_STR);
     $stmt->bindValue(':user_id', $lastInsertID, PDO::PARAM_STR);
     $stmt->bindValue(':status',$status, PDO::PARAM_STR);
-
+    if ($google_login!='0') {
+        $stmt->bindValue(':google_login', $google_login, PDO::PARAM_STR);
+    }
     $stmt->execute();
 }
 
@@ -434,6 +526,32 @@ function registerUser(PDO $pdo, string $password, string $firstname, string $las
 
 }
 
+/**Function registers user using OAuth and returns id of created user
+ * @param PDO $pdo
+ * @param string $password
+ * @param string $firstname
+ * @param string $lastname
+ * @param string $email
+ * @param string $token
+ * @return int
+ */
+function registerUserGoogle(PDO $pdo, string $google_id, string $firstname, string $lastname, string $email): int
+{
+    $sql = "INSERT INTO users2(google_id,firstname,lastname,email,active)
+            VALUES (:google_id,:firstname,:lastname,:email,1)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':google_id', $google_id, PDO::PARAM_STR);
+    $stmt->bindParam(':firstname', $firstname, PDO::PARAM_STR);
+    $stmt->bindParam(':lastname', $lastname, PDO::PARAM_STR);
+    $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+    $stmt->execute();
+
+    // http://dev.mysql.com/doc/refman/5.6/en/date-and-time-functions.html
+
+    return $pdo->lastInsertId();
+
+}
+
 
 /** Function creates random token for given length in bytes
  * @param int $length
@@ -524,14 +642,14 @@ function sendEmail(PDO $pdo, string $email, array $emailData, string $body, int 
     try {
 
         $phpmailer->isSMTP();
-        $phpmailer->Host = 'first.stud.vts.su.ac.rs';
+        $phpmailer->Host = 'rsharp.stud.vts.su.ac.rs';
         $phpmailer->SMTPAuth = true;
         $phpmailer->Port = 587;
-        $phpmailer->Username = 'first';
-        $phpmailer->Password = 'ZADcO14NsZMPzeU';
+        $phpmailer->Username = 'rsharp';
+        $phpmailer->Password = 'HE9TiVYvUs1G9Xl';
 
 
-        $phpmailer->setFrom('first@first.stud.vts.su.ac.rs', 'Admin');
+        $phpmailer->setFrom('rsharp@rsharp.stud.vts.su.ac.rs', 'Admin');
         $phpmailer->addAddress("$email");
 
         $phpmailer->isHTML(true);

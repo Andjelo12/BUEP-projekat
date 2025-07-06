@@ -1,8 +1,31 @@
 <?php
 session_start();
+header("Content-Security-Policy: 
+    default-src 'self'; 
+    script-src 'self' 'unsafe-inline' https://code.jquery.com https://cdn.jsdelivr.net https://cdn.datatables.net; 
+    style-src 'self' https://cdn.jsdelivr.net https://cdn.datatables.net; 
+    font-src https://cdn.jsdelivr.net; 
+    img-src 'self' data:; 
+    connect-src 'self'; 
+    object-src 'none'; 
+    frame-ancestors 'none'; 
+    base-uri 'self';
+");
 require_once 'config.php';
 require_once 'functions_def.php';
-if (!isset($_SESSION['username'])) {
+require 'vendor/autoload.php';
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+if (isset($_SESSION['jwt_token']) /*&& $_SESSION['is_admin']=='No'*/) {
+    try {
+        $decoded = JWT::decode($_SESSION['jwt_token'], new Key($_ENV['jwt_secret_key'], 'HS256'));
+    }catch (\Firebase\JWT\ExpiredException){
+        redirection('login.php');
+    }
+}
+if (!isset($decoded)) {
     redirection('login.php?l=0');
 }
 ?>
@@ -23,7 +46,6 @@ if (!isset($_SESSION['username'])) {
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script src="js/scriptDtb.js"></script>
     <style>
         html,
         body {
@@ -104,7 +126,7 @@ if (!isset($_SESSION['username'])) {
                 type: 'POST',
                 url: 'deleteUserProfile.php',
                 data: {
-                    email: '<?php echo $_SESSION['username']?>'
+                    email: '<?php echo $decoded->data->username?>'
                 },
                 success: function (response) {
                     // Handle success response if needed
@@ -144,7 +166,7 @@ require_once 'header.php';
     }
     $sql = "SELECT * FROM users2 WHERE id_user=:id";
     $query = $pdo -> prepare($sql);
-    $query->bindParam(':id', $_SESSION['id_user'], PDO::PARAM_INT);
+    $query->bindParam(':id', $decoded->data->id_user, PDO::PARAM_INT);
     $query->execute();
     $results=$query->fetch(PDO::FETCH_OBJ);
     if($query->rowCount() > 0)
@@ -155,7 +177,7 @@ require_once 'header.php';
     }
     ?>
     <div class="container">
-        <input type="text" name="id_user" id="id_user" value="<?php echo $_SESSION['id_user']; ?>" style="display: none">
+        <input type="text" name="id_user" id="id_user" value="<?php echo $decoded->data->id_user; ?>" style="display: none">
         <div class="justify-content-center row" >
         <div style="width: 22rem">
         <div class="mb-3">
@@ -170,9 +192,11 @@ require_once 'header.php';
         </div>
         <div class="mb-3">
             <div class="d-flex justify-content-between">
-            <?php if (empty($requestSend)){?>
-                <a href="change_pass.php" style="display: initial">Resetuj lozinku</a><a href="#!" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" id="deletProfile" class="link-danger">Obriši profil</a>
-            <?php } else {?>
+            <?php if (empty($requestSend)){ ?>
+                <a href="change_pass.php" style="display: initial">Resetuj lozinku</a>
+                <?php if(isset($decoded->data->is_admin) && $decoded->data->is_admin=='No'){?>
+                <a href="#!" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" id="deletProfile" class="link-danger">Obriši profil</a>
+            <?php }} else {?>
                 <a href="#" onclick="showBlockedModal()" style="color: #f00">Resetuj lozinku</a><a href="#!" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" id="deletProfile" class="link-danger">Obriši profil</a>
             <?php }?>
             </div>

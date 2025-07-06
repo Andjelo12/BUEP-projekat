@@ -61,13 +61,13 @@ while($row = mysqli_fetch_assoc($query))
     }
     switch ($row['status']){
         case 'success':
-            $sub_array[] = '<span style="color: #0f0">uspešna prijavljen</span>';
+            $sub_array[] = '<span style="color: #0f0">uspešna prijava</span>';
             break;
         case 'banned':
-            $sub_array[] = '<span style="color: #f00">blokirani korisnik</span>';
+            $sub_array[] = '<span style="color: #f00">blokiran korisnik</span>';
             break;
         case 'wrong data':
-            $sub_array[] = '<span style="color: #f00">pogrešnan unos</span>';
+            $sub_array[] = '<span style="color: #f00">pogrešan unos</span>';
             break;
         case 'register':
             $sub_array[] = '<span style="color: #00f">registracija novog korisnika</span>';

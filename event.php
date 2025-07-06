@@ -2,6 +2,18 @@
 session_start();
 require_once 'config.php';
 require_once 'functions_def.php';
+require 'vendor/autoload.php';
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+if (isset($_SESSION['jwt_token']) /*&& $_SESSION['is_admin']=='No'*/) {
+    try {
+        $decoded = JWT::decode($_SESSION['jwt_token'], new Key($_ENV['jwt_secret_key'], 'HS256'));
+    }catch (\Firebase\JWT\ExpiredException){
+        redirection('login.php');
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -19,7 +31,7 @@ require_once 'functions_def.php';
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script src="js/scriptDtb.js"></script>
+    <!--<script src="js/scriptDtb.js"></script>-->
     <style>
         html,
         body {
@@ -101,8 +113,8 @@ if($query->rowCount() > 0) {
                 <br><br>
                 <?php
                 $name=$result->name;
-                if(isset($_SESSION['username'])){
-                if ($result->created_by != $_SESSION['username'] && $_SESSION['is_admin']=='No'){
+                if(isset($decoded->data->username)){
+                if ($result->created_by != $decoded->data->username && $decoded->data->is_admin=='No'){
                     $sql2="SELECT * FROM invites WHERE event_id=:event_id";
                     $stmt2=$pdo->prepare($sql2);
                     $stmt2->bindValue(":event_id", $event_no,PDO::PARAM_INT);
@@ -110,7 +122,7 @@ if($query->rowCount() > 0) {
                     $results2=$stmt2->fetchAll();
                     $found=false;
                     foreach ($results2 as $result2){
-                        if ($result2['email'] == $_SESSION['username']) {
+                        if ($result2['email'] == $decoded->data->username) {
                             echo "<a href='' style='color: #0f0'>Već ste pozvani na događaj!</a>";
                             $found = true;
                             break;
@@ -123,7 +135,7 @@ if($query->rowCount() > 0) {
                         $stmt3->execute();
                         $results3=$stmt3->fetchAll();
                         foreach ($results3 as $result3){
-                            if ($result3['sender_email'] == $_SESSION['username']) {
+                            if ($result3['sender_email'] == $decoded->data->username) {
                                 echo "<a href='' style='color: #0f0'>Vaš zahtev se trenutno obrađuje.</a>";
                                 $found = true;
                                 break;
@@ -138,8 +150,8 @@ if($query->rowCount() > 0) {
                         <input type="hidden" name="organiser" value="<?php echo $result->created_by ?>">
                         <input type="hidden" name="event_no" value="<?php echo $_GET['event_no'] ?>">
                         <input type="hidden" name="name" value="<?php echo $name ?>">
-                        <input type="text" style="display: none" name="inviteName" id="inviteName" value="<?php echo $_SESSION['firstname'] ?>">
-                        <input type="text" style="display: none" id="inviteEmail" name="inviteEmail" value="<?php echo $_SESSION['username']?>">
+                        <input type="text" style="display: none" name="inviteName" id="inviteName" value="<?php echo $decoded->data->firstname ?>">
+                        <input type="text" style="display: none" id="inviteEmail" name="inviteEmail" value="<?php echo $decoded->data->username?>">
                         <textarea class="form-control" style="margin-top: 5px" name="message" id="message" rows="3" placeholder="Unesite poruku organizatoru događaja"></textarea>
                         <small></small>
                         <button type="submit" class="btn btn-primary" style="margin-top: 5px">Pošaljite</button>
@@ -166,6 +178,9 @@ if($query->rowCount() > 0) {
                 <?php } else {
                     if ($archived=='no') {
                         require_once 'phpqrcode/qrlib.php';
+//                        require_once "vendor/autoload.php";
+
+                        //require_once 'vendor/nmiles/phpqrcode/src';
                         echo "Zainteresovani za događaj? Skenirajte kod!<br>";
                         QRcode::png(SITE . "QRinvite.php?event_no=" . $_GET['event_no'], 'images/temp/temp.png', QR_ECLEVEL_L, 5, 2);
 //                    QRcode::png('https://www.google.com/', 'images/temp/temp.png', QR_ECLEVEL_L, 5, 2);
