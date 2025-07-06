@@ -1,0 +1,227 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "BUEP projekat",
+    "description": "Projekat je realizacije mobilne aplikacije [sajta](https://rsharp.stud.vts.su.ac.rs/) za kreiranje događaja.\nPutem aplikacije korisnik može da:\n- pogleda aktuelne događaje\n- napravi nalog\n- kreira nove događaje\n- dodaje poklone i pozivnice.\n\n Aplikacija komunicira sa bazom putem api poziva koji su testirani u ovom dokumentu.",
+    "version": "1.0.11"
+  },
+  "servers": [
+    {
+      "url": "https://rsharp.stud.vts.su.ac.rs/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "events",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/events/" : {
+      "post": {
+        "tags": [
+          "events"
+        ],
+        "summary": "korisnički događaji",
+        "description": "prikaz korisnikovih događaja",
+        "requestBody": {
+          "description": "potrebno je navesti email korisnika čije događaje želimo da izlistamo",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "26121057@vts.su.ac.rs"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Data found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Events"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/events": {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "svi događaji",
+        "description": "detalji svih događaja",
+        "responses": {
+          "200": {
+            "description": "Data found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Events"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/events/{event_id}" : {
+      "get": {
+        "tags": [
+          "events"
+        ],
+        "summary": "pronađite događaj",
+        "description": "detalji događaja koji vas zanima",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "description": "ID događaja",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Events"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data Not Found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "events"
+        ],
+        "summary": "obrišite događaji",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "description": "id događaja koji želite da obrišete",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data deleted successfully."
+          },
+          "404": {
+            "description": "Event with given ID doesn't exist"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "events"
+        ],
+        "summary": "arhiviranje događaj",
+        "parameters": [
+          {
+            "name": "event_id",
+            "in": "path",
+            "description": "ID događaja koji se arhivira",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Event archived"
+          },
+          "400": {
+            "description": "Wrong ID!"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Events": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "andjell009@gmail.com"
+          },
+          "eventName": {
+            "type": "string",
+            "example": "Rođendan"
+          },
+          "description": {
+            "type": "string",
+            "example": "Detalji događaja"
+          },
+          "location": {
+            "type": "string",
+            "example": "Subotica"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

@@ -1,5 +1,16 @@
 <?php
 require_once 'config.php';
+require __DIR__ . "/vendor/autoload.php";
+$client = new Google\Client();
+
+$client->setClientId("912256885401-ghr2br1tj0occ6bjnqmtrq07fu3ds8g3.apps.googleusercontent.com");
+$client->setClientSecret("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");
+$client->setRedirectUri("https://rsharp.stud.vts.su.ac.rs/redirectRegister.php");
+
+$client->addScope("email");
+$client->addScope("profile");
+
+$url = $client->createAuthUrl();
 ?>
 <!doctype html>
 <html lang="en">
@@ -84,12 +95,18 @@ require_once 'config.php';
         <small></small>
     </div>
 
-    <div class="pt-3">
+    <div class="pt-3 text-center">
         <input type="hidden" name="action" value="register">
         <button type="submit" class="btn btn-primary">Registruj se</button>
         <button type="reset" class="btn btn-primary resetButton" >Otkaži</button>
     </div>
 </form>
+<div class="pt-3 text-center">
+    <a href="<?php echo $url ?>" class="btn btn-outline-danger w-100">
+        <img src="https://developers.google.com/identity/images/g-logo.png" style="width:20px; margin-right:8px;">
+        Registruj se sa Google nalogom
+    </a>
+</div>
 
 <?php
 $r = 0;
