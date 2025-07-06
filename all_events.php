@@ -2,7 +2,19 @@
 session_start();
 require_once 'config.php';
 require_once 'functions_def.php';
-if (!isset($_SESSION['username']) OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])) {
+require 'vendor/autoload.php';
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+if (isset($_SESSION['jwt_token']) /*&& $_SESSION['is_admin']=='No'*/) {
+    try {
+        $decoded = JWT::decode($_SESSION['jwt_token'], new Key($_ENV['jwt_secret_key'], 'HS256'));
+    }catch (\Firebase\JWT\ExpiredException){
+        redirection('login.php');
+    }
+}
+if (!isset($decoded) /*OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])*/) {
     redirection('login.php?l=0');
 }
 $archived=$_GET['archived']??null;
@@ -60,7 +72,6 @@ if ($archived==0){
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script src="js/scriptDtb.js"></script>
     <style>
         html,
         body {
@@ -189,7 +200,7 @@ if ($archived==0){
             }
             require_once 'functions_def.php';
             //$sql = "SELECT estates.id_estate,estates.description,estates.estate_type,estates.location,estates.price,estates.foto,estates.rent_period,estates.status, estates.approved FROM estates INNER JOIN user_estate ON estates.id_estate=user_estate.id_estate WHERE email=:email";
-            if($_SESSION['is_admin']=='Yes') {
+            if($decoded->data->is_admin=='Yes') {
                 if ($archived==0)
                     $sql = "SELECT * FROM event WHERE archived='No'";
                 else
@@ -199,11 +210,11 @@ if ($archived==0){
                 if($archived==0) {
                     $sql = "SELECT * FROM event WHERE created_by=:created_by and archived='No'";
                     $query = $pdo->prepare($sql);
-                    $query->bindParam(':created_by', $_SESSION["username"], PDO::PARAM_STR);
+                    $query->bindParam(':created_by', $decoded->data->username, PDO::PARAM_STR);
                 } else {
                     $sql = "SELECT * FROM event WHERE created_by=:created_by and archived='Yes'";
                     $query = $pdo->prepare($sql);
-                    $query->bindParam(':created_by', $_SESSION["username"], PDO::PARAM_STR);
+                    $query->bindParam(':created_by', $decoded->data->username, PDO::PARAM_STR);
                 }
             }
             $query->execute();
@@ -229,23 +240,23 @@ if ($archived==0){
                     $stmt3->bindValue(":id_event",$result->id,PDO::PARAM_INT);
                     $stmt3->execute();
                     $result3=$stmt3->fetch();
-                    if ($result3['cnt']>0 && $_SESSION['is_admin']=='No'){
+                    if ($result3['cnt']>0 && $decoded->data->is_admin=='No'){
                     ?>
                     <div style="position: relative;text-align: center;">
                         <div style="position: absolute; top: 2px; right: 2px;"><button class="btn btn-dark" type="button" onclick="checkMessage(<?php echo $result->id?>)"><i class="bi bi-chat-square-text"></i> <sup><?php echo $result3['cnt']?></sup></button></div>
                     </div>
                     <?php }?>
-                    <img height="320px" src="images/events/<?php echo $result->foto?>"  alt="Image" />
+                    <img height="320px" src="images/events/<?php echo $result->foto?>"  alt="Image" class="card-img-top rounded-top"/>
                     <div class="card-body">
                         <p class="card-text"><?php echo $result->description ?></p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div class="btn-group">
                                 <button type="button" class="btn btn-sm btn-outline-success <?php if ($archived!=0) echo 'disabled';?>" onclick="window.location.href='edit_event.php?id=<?php echo $result->id; ?>&archived=<?php echo $archived; ?>'">Izmeni</button>
                                 <?php if ($result->archived=='yes'){
-                                        if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']=='No'){
+                                        if (isset($decoded->data->is_admin) && $decoded->data->is_admin=='No'){
                                     ?>
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteEvent(<?php echo $result->id; ?>,'<?php echo $result->foto; ?>')">Obriši</button>
-                                <?php } else if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']=='Yes') { ?>
+                                <?php } else if (isset($decoded->data->is_admin) && $decoded->data->is_admin=='Yes') { ?>
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteEventAdmin(<?php echo $result->id; ?>,'<?php echo $result->foto; ?>')">Obriši</button>
                                 <?php } } if ($result->archived=='no'){?>
                                     <button type="button" class="btn btn-sm btn-outline-danger" onclick="showArchiveConfirmation(<?php echo $result->id; ?>)">Arhiviraj</button>
@@ -257,7 +268,7 @@ if ($archived==0){
                             </div>
                         </div>
                         <?php
-                        if ($_SESSION['is_admin']=='Yes'){
+                        if ($decoded->data->is_admin=='Yes'){
                         ?>
                         <div class="d-flex justify-content-between align-items-center" style="margin-top: 10px">
                             <div class="btn-group">

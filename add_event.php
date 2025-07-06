@@ -1,11 +1,33 @@
 <?php
 session_start();
+header("Content-Security-Policy: 
+    default-src 'self'; 
+    script-src 'self' https://code.jquery.com https://cdn.jsdelivr.net https://cdn.datatables.net; 
+    style-src 'self' https://cdn.jsdelivr.net https://cdn.datatables.net; 
+    font-src https://cdn.jsdelivr.net; 
+    img-src 'self' data:; 
+    object-src 'none'; 
+    base-uri 'self'; 
+    frame-ancestors 'none';
+");
 require_once 'config.php';
 require_once 'functions_def.php';
-if (!isset($_SESSION['username']) OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])) {
+require 'vendor/autoload.php';
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+if (isset($_SESSION['jwt_token']) /*&& $_SESSION['is_admin']=='No'*/) {
+    try {
+        $decoded = JWT::decode($_SESSION['jwt_token'], new Key($_ENV['jwt_secret_key'], 'HS256'));
+    }catch (\Firebase\JWT\ExpiredException){
+        redirection('login.php');
+    }
+}
+if (!isset($decoded) /*OR !isset($_SESSION['id_user']) OR !is_int($_SESSION['id_user'])*/) {
     redirection('login.php?l=0');
 }
-if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']=='Yes')
+if (isset($decoded->data->is_admin) && $decoded->data->is_admin=='Yes')
     redirection('login.php?l=0');
 ?>
 
@@ -25,7 +47,6 @@ if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']=='Yes')
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css">
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
-    <script src="js/scriptDtb.js"></script>
     <script src="js/addEventChk.js"></script>
     <style>
         small{
@@ -38,7 +59,7 @@ require_once 'header.php';
 ?><br>
 <form method="post" action="add.php" enctype="multipart/form-data" id="addEvent" name="addEvent">
 <div class="container">
-    <input type="text" name="created_by" value="<?php echo $_SESSION['username']; ?>" style="display: none">
+    <input type="text" name="created_by" value="<?php echo $decoded->data->username; ?>" style="display: none">
     <div class="justify-content-center row" >
         <div style="width: 37rem">
     <div class="mb-3">

@@ -59,10 +59,10 @@ if($query->rowCount() > 0)
             $phpmailer = new PHPMailer(true);
             $phpmailer->isSMTP();
             //$phpmailer->SMTPDebug=1;
-            $phpmailer->Host = 'first.stud.vts.su.ac.rs';
+            $phpmailer->Host = 'rsharp.stud.vts.su.ac.rs';
             $phpmailer->SMTPAuth = true;
-            $phpmailer->Username   = 'first';
-            $phpmailer->Password   = 'ZADcO14NsZMPzeU';
+            $phpmailer->Username   = 'rsharp';
+            $phpmailer->Password   = 'HE9TiVYvUs1G9Xl';
             $phpmailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $phpmailer->Port = 587;
 

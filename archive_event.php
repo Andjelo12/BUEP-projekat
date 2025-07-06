@@ -25,14 +25,14 @@ if ($_SESSION['is_admin']){
         $result=$query->fetch();
         //$phpmailer->SMTPDebug = SMTP::DEBUG_SERVER; // /Enable verbose debug output, you can put this in comment in production
         $phpmailer->isSMTP();
-        $phpmailer->Host = 'first.stud.vts.su.ac.rs';
+        $phpmailer->Host = 'rsharp.stud.vts.su.ac.rs';
         $phpmailer->SMTPAuth = true;
-        $phpmailer->Username   = 'first';
-        $phpmailer->Password   = 'ZADcO14NsZMPzeU';
+        $phpmailer->Username   = 'rsharp';
+        $phpmailer->Password   = 'HE9TiVYvUs1G9Xl';
         $phpmailer->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $phpmailer->Port = 587;
 
-        $phpmailer->setFrom("first@first.stud.vts.su.ac.rs", "Admin");
+        $phpmailer->setFrom("rsharp@rsharp.stud.vts.su.ac.rs", "Admin");
         $phpmailer->addAddress("{$result['created_by']}");
 
         $phpmailer->isHTML(false);
