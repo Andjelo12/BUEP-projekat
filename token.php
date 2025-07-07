@@ -112,12 +112,22 @@ require_once 'header.php';
                             <h5 class="mb-0">Tvoj API token</h5>
                         </div>
                         <div class="card-body">
-                            <!-- TOKEN COPY -->
-                            <label for="bearerToken" class="form-label">Bearer token</label>
+                            <!-- API Endpoint -->
+                            <label class="form-label">API endpoint</label>
                             <div class="input-group mb-3">
-                                <span class="input-group-text" id="token-label">Bearer token</span>
-                                <input type="text" class="form-control" id="bearerToken" value="<?php echo htmlspecialchars($bareToken); ?>" readonly aria-describedby="token-label">
-                                <button class="btn btn-outline-secondary" type="button" id="copyBtn">
+                                <span class="input-group-text">API</span>
+                                <input type="text" class="form-control" id="apiEndpoint" value="https://rsharp.stud.vts.su.ac.rs/api/events/" readonly>
+                                <button class="btn btn-outline-secondary copy-btn" data-target="apiEndpoint">
+                                    <i class="bi bi-clipboard"></i> Copy
+                                </button>
+                            </div>
+
+                            <!-- Bearer token -->
+                            <label class="form-label">Bearer token</label>
+                            <div class="input-group mb-3">
+                                <span class="input-group-text">Token</span>
+                                <input type="text" class="form-control" id="bearerToken" value="<?= htmlspecialchars($bareToken) ?>" readonly>
+                                <button class="btn btn-outline-secondary copy-btn" data-target="bearerToken">
                                     <i class="bi bi-clipboard"></i> Copy
                                 </button>
                             </div>
@@ -140,15 +150,18 @@ require_once 'header.php';
                         </div>
                     </div>
                     <script>
-                        document.getElementById("copyBtn").addEventListener("click", function () {
-                            const tokenInput = document.getElementById("bearerToken");
-                            tokenInput.select();
-                            tokenInput.setSelectionRange(0, 99999); // za mobilne uređaje
-                            navigator.clipboard.writeText(tokenInput.value).then(() => {
-                                this.innerHTML = '<i class="bi bi-clipboard-check"></i> Copied!';
-                                setTimeout(() => {
-                                    this.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
-                                }, 2000);
+                        document.querySelectorAll(".copy-btn").forEach(button => {
+                            button.addEventListener("click", function () {
+                                const targetId = this.dataset.target;
+                                const input = document.getElementById(targetId);
+                                input.select();
+                                input.setSelectionRange(0, 99999);
+                                navigator.clipboard.writeText(input.value).then(() => {
+                                    this.innerHTML = '<i class="bi bi-clipboard-check"></i> Copied!';
+                                    setTimeout(() => {
+                                        this.innerHTML = '<i class="bi bi-clipboard"></i> Copy';
+                                    }, 2000);
+                                });
                             });
                         });
                     </script>
