@@ -202,6 +202,6 @@ if ($method==="patch" && !empty($id)){
     $response = archiveEvent($id,$user['email']);
 
     $response ? response(200, "Event archived") :
-        response(400, "Wrong ID!");
+        response(403, "Wrong ID!");
     exit();
 }
