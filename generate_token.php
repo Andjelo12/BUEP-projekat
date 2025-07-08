@@ -16,12 +16,17 @@ if (isset($_SESSION['jwt_token']) /*&& $_SESSION['is_admin']=='No'*/) {
 }
 $email=$decoded->data->username;
 $token = 'Bearer ' . createToken(10);
-$sql = "INSERT INTO tokens(token, email) VALUES (:token, :email)";
+$sql = "SELECT * FROM tokens WHERE email=:email";
 $query = $pdo -> prepare($sql);
-$query->bindParam(':token',$token,PDO::PARAM_STR);
 $query->bindParam(':email',$email, PDO::PARAM_STR);
 $query->execute();
-//if($query->rowCount() > 0)
-//{
-header("Location: token.php");
-//}
+if($query->rowCount() > 0){
+    header("Location: token.php");
+} else {
+    $sql = "INSERT INTO tokens(token, email) VALUES (:token, :email)";
+    $query = $pdo -> prepare($sql);
+    $query->bindParam(':token',$token,PDO::PARAM_STR);
+    $query->bindParam(':email',$email, PDO::PARAM_STR);
+    $query->execute();
+    header("Location: token.php");
+}
