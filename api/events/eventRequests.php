@@ -39,16 +39,15 @@ if (!$user) {
     exit();
 }
 if($stmt->rowCount() > 0){
-    $sql = "SELECT calls_no, account_type, last_call, last_reset, tokens_no FROM tokens WHERE token=:token";
+    $sql = "SELECT calls_no, account_type, last_call, tokens_no FROM tokens WHERE token=:token";
     $stmt = $GLOBALS['pdo']->prepare($sql);
     $stmt->bindValue(":token", $token, PDO::PARAM_INT);
     $stmt->execute();
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $lastCall = new DateTime($result['last_call']);
-    $oneMonthAgo = new DateTime('-1 month');
-    $lastReset = new DateTime($result['last_reset']);
-    if($lastCall < $oneMonthAgo && $lastReset < $oneMonthAgo){
-        $sql="UPDATE tokens SET calls_no=0, last_reset = NOW() WHERE token=:token";
+    $oneDayAgo = new DateTime('-1 day');
+    if($lastCall < $oneDayAgo){
+        $sql="UPDATE tokens SET calls_no=0, last_call = NOW() WHERE token=:token";
         $stmt=$GLOBALS['pdo']->prepare($sql);
         $stmt->bindValue(':token', $token, PDO::PARAM_STR);
         $stmt->execute();
