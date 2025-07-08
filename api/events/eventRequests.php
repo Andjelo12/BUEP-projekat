@@ -27,12 +27,17 @@ if (!preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
 
 $token = 'Bearer '.$matches[1];
 
-$sql = "SELECT * FROM tokens WHERE token=:token";
+$sql = "SELECT * FROM tokens WHERE token=:token and blocked = 0 and calls_no < tokens_no";
 $stmt = $GLOBALS['pdo']->prepare($sql);
 $stmt->bindValue(":token",$token,PDO::PARAM_STR);
 $stmt->execute();
 
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
+if (!$user) {
+    http_response_code(401);
+    echo json_encode(["message" => "Invalid token or daily limit exceeded"]);
+    exit();
+}
 if($stmt->rowCount() > 0){
     $sql = "SELECT calls_no, account_type, last_call, last_reset, tokens_no FROM tokens WHERE token=:token";
     $stmt = $GLOBALS['pdo']->prepare($sql);
@@ -88,11 +93,7 @@ if($stmt->rowCount() > 0){
     exit();
 }
 
-if (!$user) {
-    http_response_code(401);
-    echo json_encode(["message" => "Invalid token or daily limit exceeded"]);
-    exit();
-}
+
 
 $postData = file_get_contents('php://input');
 $email=null;
@@ -190,7 +191,7 @@ if ($method === 'post') {
 }
 
 if ($method==="delete" && !empty($id)){
-    $deleteData = deleteEvent($id);
+    $deleteData = deleteEvent($id,$user['email']);
 
     $deleteData ? response(200,"Data deleted successfully.") : response(404,"Event with given ID doesn't exsist");
 
@@ -199,7 +200,7 @@ if ($method==="delete" && !empty($id)){
 }
 
 if ($method==="patch" && !empty($id)){
-    $response = archiveEvent($id);
+    $response = archiveEvent($id,$user['email']);
 
     $response ? response(200, "Event archived") :
         response(400, "Wrong ID!");
