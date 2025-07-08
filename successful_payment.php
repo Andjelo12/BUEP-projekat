@@ -19,10 +19,10 @@ switch ($plan) {
         $tokens_no=200;
         break;
     case 'gold':
-        $tokens_no=350;
+        $tokens_no=500;
         break;
     case 'platinum':
-        $tokens_no=550;
+        $tokens_no=1000;
         break;
 }
 $stmt->bindParam(':tokens_no', $tokens_no, PDO::PARAM_STR);
