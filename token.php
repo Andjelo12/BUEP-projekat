@@ -138,6 +138,7 @@ require_once 'header.php';
                                 <span class="badge" style="background-color: <?php echo $color; ?>; color: black;"><?php echo ucfirst($result['account_type']); ?></span>
                             <form method="post" action="upgrade_account.php" class="d-inline-block ms-2">
                                 <input type="hidden" name="plan" value="<?php echo $result['account_type']; ?>">
+                                <input type="hidden" name="email" value="<?php echo $decoded->data->username; ?>">
                                 <button type="submit" class="btn btn-sm btn-outline-info">Upgrade</button>
                             </form>
                             </p>

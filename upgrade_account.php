@@ -80,6 +80,7 @@ require_once 'header.php';
                     <p class="card-text">150 API poziva/mesečno</p>
                     <form action="checkout.php" method="post">
                         <input type="hidden" name="plan" value="silver">
+                        <input type="hidden" name="email" value="<?php echo $_POST['email']; ?>">
                         <input type="hidden" name="price" value="99">
                         <button type="submit" class="btn btn-secondary">Kupi Silver</button>
                     </form>
@@ -97,6 +98,7 @@ require_once 'header.php';
                     <h2 class="card-title">€1.99</h2>
                     <p class="card-text">300 API poziva/mesečno</p>
                     <form action="checkout.php" method="post">
+                        <input type="hidden" name="email" value="<?php echo $_POST['email']; ?>">
                         <input type="hidden" name="plan" value="gold">
                         <input type="hidden" name="price" value="199">
                         <button type="submit" class="btn btn-warning text-white">Kupi Gold</button>
@@ -115,6 +117,7 @@ require_once 'header.php';
                     <h2 class="card-title">€2.99</h2>
                     <p class="card-text">500 API poziva/mesečno</p>
                     <form action="checkout.php" method="post">
+                        <input type="hidden" name="email" value="<?php echo $_POST['email']; ?>">
                         <input type="hidden" name="plan" value="platinum">
                         <input type="hidden" name="price" value="299">
                         <button type="submit" class="btn btn-primary">Kupi Platinum</button>
@@ -135,6 +138,7 @@ require_once 'header.php';
                     <h2 class="card-title">€1.99</h2>
                     <p class="card-text">300 API poziva/mesečno</p>
                     <form action="checkout.php" method="post">
+                        <input type="hidden" name="email" value="<?php echo $_POST['email']; ?>">
                         <input type="hidden" name="plan" value="gold">
                         <input type="hidden" name="price" value="199">
                         <button type="submit" class="btn btn-warning text-white">Kupi Gold</button>
@@ -153,6 +157,7 @@ require_once 'header.php';
                         <h2 class="card-title">€2.99</h2>
                         <p class="card-text">500 API poziva/mesečno</p>
                         <form action="checkout.php" method="post">
+                            <input type="hidden" name="email" value="<?php echo $_POST['email']; ?>">
                             <input type="hidden" name="plan" value="platinum">
                             <input type="hidden" name="price" value="299">
                             <button type="submit" class="btn btn-primary">Kupi Platinum</button>
@@ -172,6 +177,7 @@ require_once 'header.php';
                     <h2 class="card-title">€2.99</h2>
                     <p class="card-text">500 API poziva/mesečno</p>
                     <form action="checkout.php" method="post">
+                        <input type="hidden" name="email" value="<?php echo $_POST['email']; ?>">
                         <input type="hidden" name="plan" value="platinum">
                         <input type="hidden" name="price" value="299">
                         <button type="submit" class="btn btn-primary">Kupi Platinum</button>

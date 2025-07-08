@@ -8,7 +8,7 @@ $dotenv->load();
 
 $checkout_session = \Stripe\Checkout\Session::create([
     "mode" => "payment",
-    "success_url" => "https://rsharp.stud.vts.su.ac.rs/successful_payment.php?type=".$_POST['plan'],
+    "success_url" => "https://rsharp.stud.vts.su.ac.rs/successful_payment.php?session_id={CHECKOUT_SESSION_ID}",/*?type=".$_POST['plan']."&email=".$_POST['email'],*/
     "cancel_url" => "https://rsharp.stud.vts.su.ac.rs/index.php",
     "line_items" => [
         [
@@ -21,6 +21,10 @@ $checkout_session = \Stripe\Checkout\Session::create([
                 ]
             ]
         ]
+    ],
+    "metadata" => [
+        "email" => $_POST['email'],
+        "plan" => $_POST['plan']
     ]
 ]);
 
