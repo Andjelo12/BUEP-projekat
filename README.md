@@ -1,3 +1,1 @@
-composer require stripe/stripe-php
-composer require firebase/php-jwt
-composer require google/apiclient
+composer require stripe/stripe-php firebase/php-jwt google/apiclient
