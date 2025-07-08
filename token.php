@@ -145,7 +145,14 @@ require_once 'header.php';
                             <!-- API POZIVI -->
                             <p>
                                 <strong>Preostali broj API poziva:</strong>
-                                <span class="text-success"><?php echo $result['tokens_no'] - $result['calls_no']; ?></span>
+                                <?php
+                                    $left_calls = $result['tokens_no'] - $result['calls_no'];
+                                    if ($left_calls > 0) {
+                                        echo "<span class='text-success'>".$left_calls."</span>";
+                                    }else{
+                                        echo "<span class='text-danger'>".$left_calls."</span>";
+                                    }
+                                ?>
                             </p>
                         </div>
                     </div>
